@@ -186,6 +186,11 @@ _Use_decl_annotations_ INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
     SetUnhandledExceptionFilter(CreateMiniDump);
   }
 
+#if defined(_M_ARM)
+  // the main thread renders GUI and video; software video decoding starves it on quad-core ARM32 otherwise
+  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+#endif
+
   int status{0};
   HRESULT hrCOM{E_FAIL};
   int rcWinsock{WSANOTINITIALISED};

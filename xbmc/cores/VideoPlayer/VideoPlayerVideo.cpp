@@ -24,6 +24,7 @@
 #include "windowing/WinSystem.h"
 
 #include <algorithm>
+#include <chrono>
 #include <iomanip>
 #include <iterator>
 #include <memory>
@@ -32,6 +33,37 @@
 #include <sstream>
 
 using namespace std::chrono_literals;
+
+namespace
+{
+// kodi-rt diagnostic for Stage 5, to remove once done: the video thread's work per 5 s, at info level
+enum class RtVideoEvent
+{
+  Picture,
+  Shown,
+  LateSkip,
+  SkippedPacket,
+  Count
+};
+
+void KodiRtVideoStat(RtVideoEvent ev)
+{
+  static int counts[static_cast<int>(RtVideoEvent::Count)] = {};
+  static auto since = std::chrono::steady_clock::now();
+  counts[static_cast<int>(ev)]++;
+  const auto now = std::chrono::steady_clock::now();
+  if (now - since >= 5s)
+  {
+    CLog::Log(LOGINFO,
+              "kodi-rt video: {} pictures from the decoder, {} shown, {} late skips ({} packets "
+              "skipped) in {:.1f} s",
+              counts[0], counts[1], counts[2], counts[3],
+              std::chrono::duration<double>(now - since).count());
+    std::fill(std::begin(counts), std::end(counts), 0);
+    since = now;
+  }
+}
+} // namespace
 
 class CDVDMsgVideoCodecChange : public CDVDMsg
 {
@@ -604,12 +636,14 @@ void CVideoPlayerVideo::Process()
                       "CVideoPlayerVideo - video late by {}ms, skipping to next keyframe",
                       DVD_TIME_TO_MSEC(lateness));
             m_skipToKeyFrame = true;
+            KodiRtVideoStat(RtVideoEvent::LateSkip);
           }
         }
       }
       if (m_skipToKeyFrame)
       {
         m_iDroppedFrames++;
+        KodiRtVideoStat(RtVideoEvent::SkippedPacket);
         continue;
       }
 
@@ -844,6 +878,7 @@ bool CVideoPlayerVideo::ProcessDecoderOutput(double &frametime, double &pts)
       pts += m_picture.iDuration * m_speed / abs(m_speed);
 
     m_outputSate = OutputPicture(&m_picture);
+    KodiRtVideoStat(RtVideoEvent::Picture);
 
     if (m_outputSate == OUTPUT_AGAIN)
     {
@@ -1058,6 +1093,7 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
     return OUTPUT_DROPPED;
   }
 
+  KodiRtVideoStat(RtVideoEvent::Shown);
   return OUTPUT_NORMAL;
 }
 

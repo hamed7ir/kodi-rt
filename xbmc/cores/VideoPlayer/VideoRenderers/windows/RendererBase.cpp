@@ -24,6 +24,9 @@
 #include "utils/log.h"
 #include "windowing/GraphicContext.h"
 
+#include <algorithm>
+#include <chrono>
+
 using namespace Microsoft::WRL;
 
 namespace
@@ -270,9 +273,29 @@ void CRendererBase::Render(int index,
                            const CRect& viewRect,
                            unsigned flags)
 {
+  // kodi-rt diagnostic for Stage 5, to remove once done: video renders and their main-thread time per 5 s
+  static int s_calls = 0;
+  static int64_t s_totalUs = 0, s_maxUs = 0;
+  static auto s_since = std::chrono::steady_clock::now();
+  const auto t0 = std::chrono::steady_clock::now();
+
   m_iBufferIndex = index;
   ManageTextures();
   Render(target, sourceRect, destRect, viewRect, flags);
+
+  const auto t1 = std::chrono::steady_clock::now();
+  const int64_t us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+  s_calls++;
+  s_totalUs += us;
+  s_maxUs = std::max(s_maxUs, us);
+  if (t1 - s_since >= std::chrono::seconds(5))
+  {
+    CLog::Log(LOGINFO, "kodi-rt render: {} video renders in {:.1f} s, {} us each on average, {} us at most",
+              s_calls, std::chrono::duration<double>(t1 - s_since).count(), s_totalUs / s_calls, s_maxUs);
+    s_calls = 0;
+    s_totalUs = s_maxUs = 0;
+    s_since = t1;
+  }
 }
 
 void CRendererBase::Render(CD3DTexture& target, const CRect& sourceRect, const CRect& destRect, const CRect& viewRect, unsigned flags)
