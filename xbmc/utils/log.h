@@ -101,6 +101,15 @@ public:
     Log(MapLogLevel(level), component, format, std::forward<Args>(args)...);
   }
 
+  // kodi-rt: clang-cl (-fms-compatibility) takes any integral constant 0, such as LOGDEBUG, as a null
+  // pointer constant, so Log(LOGDEBUG, <int component>, ...) would also match the loggerName overload
+  // below and be ambiguous. An exact match for int components resolves it.
+  template<typename... Args>
+  static void Log(int level, int component, fmt::format_string<Args...> format, Args&&... args)
+  {
+    Log(level, static_cast<uint32_t>(component), format, std::forward<Args>(args)...);
+  }
+
   template<typename... Args>
   static void Log(spdlog::level::level_enum level,
                   fmt::format_string<Args...> format,
