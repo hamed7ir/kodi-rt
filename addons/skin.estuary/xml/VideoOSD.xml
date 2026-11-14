@@ -219,11 +219,20 @@
 						<onclick>ActivateWindow(1101)</onclick>
 					</control>
 					<control type="radiobutton" id="70049">
-						<description>kodi-rt: switch between fullscreen and a window</description>
+						<description>kodi-rt: from fullscreen to a window</description>
 						<include content="OSDButton">
-							<param name="texture" value="icons/now-playing/fullscreen.png"/>
+							<param name="texture" value="osd/fullscreen/buttons/windowed.png"/>
 						</include>
 						<onclick>Action(ToggleFullScreen)</onclick>
+						<visible>System.IsFullscreen</visible>
+					</control>
+					<control type="radiobutton" id="70050">
+						<description>kodi-rt: from a window to fullscreen</description>
+						<include content="OSDButton">
+							<param name="texture" value="osd/fullscreen/buttons/fullscreen.png"/>
+						</include>
+						<onclick>Action(ToggleFullScreen)</onclick>
+						<visible>!System.IsFullscreen</visible>
 					</control>
 				</control>
 			</control>
