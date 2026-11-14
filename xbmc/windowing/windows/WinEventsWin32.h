@@ -16,6 +16,9 @@ class CGenericTouchSwipeDetector;
 class CWinEventsWin32 : public IWinEvents
 {
 public:
+  // kodi-rt: WM_COPYDATA id for files a second kodi.exe hands to the running one (WinMain.cpp)
+  static constexpr ULONG_PTR COPYDATA_OPEN_FILES = 0x4B4F4446; // "KODF"
+
   bool MessagePump() override;
   static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

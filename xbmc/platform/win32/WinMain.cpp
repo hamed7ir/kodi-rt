@@ -7,6 +7,8 @@
  */
 
 #include "CompileInfo.h"
+#include "FileItem.h"
+#include "FileItemList.h"
 #include "ServiceBroker.h"
 #include "application/AppEnvironment.h"
 #include "application/AppParamParser.h"
@@ -16,6 +18,7 @@
 #include "threads/Thread.h"
 #include "utils/CharsetConverter.h" // Required to initialize converters before usage
 #include "utils/Digest.h"
+#include "windowing/windows/WinEventsWin32.h"
 
 #include "platform/win32/CharsetConverter.h"
 #include "platform/win32/WIN32Util.h"
@@ -153,6 +156,43 @@ bool CheckAndSetProfileMutex(UserDirectoriesLocation loc, HANDLE& handle)
 
   return false;
 }
+
+/*!
+ * \brief kodi-rt: hand the files of this command line to the running instance, which plays them.
+ *
+ * \param[in] hwnd the running instance's window
+ * \param[in] files the files given on the command line
+ */
+void SendFilesToRunningInstance(HWND hwnd, const CFileItemList& files)
+{
+  std::wstring paths;
+  for (const auto& item : files)
+  {
+    std::wstring path = ToW(item->GetPath());
+    // a relative path is relative to this process's current folder, not the running Kodi's
+    if (path.find(L"://") == std::wstring::npos)
+    {
+      const DWORD size = GetFullPathNameW(path.c_str(), 0, nullptr, nullptr);
+      if (size > 0)
+      {
+        std::wstring full(size, L'\0');
+        const DWORD len = GetFullPathNameW(path.c_str(), size, full.data(), nullptr);
+        if (len > 0 && len < size)
+          path = full.substr(0, len);
+      }
+    }
+    paths += path;
+    paths += L'\n';
+  }
+  if (paths.empty())
+    return;
+
+  COPYDATASTRUCT data{CWinEventsWin32::COPYDATA_OPEN_FILES,
+                      static_cast<DWORD>(paths.size() * sizeof(wchar_t)), paths.data()};
+  DWORD_PTR result{0};
+  SendMessageTimeoutW(hwnd, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&data), SMTO_ABORTIFHUNG,
+                      5000, &result);
+}
 } // namespace
 
 //-----------------------------------------------------------------------------
@@ -229,6 +269,7 @@ _Use_decl_annotations_ INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
       // switch to the running instance
       ShowWindow(hwnd, SW_RESTORE);
       SetForegroundWindow(hwnd);
+      SendFilesToRunningInstance(hwnd, params->GetPlaylist());
     }
     status = 0;
     goto cleanup;

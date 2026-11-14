@@ -11,6 +11,8 @@
 #endif
 #include "WinEventsWin32.h"
 
+#include "FileItem.h"
+#include "FileItemList.h"
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "WinKeyMap.h"
@@ -940,6 +942,29 @@ LRESULT CALLBACK CWinEventsWin32::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
         }
       }
       break;
+    }
+    case WM_COPYDATA:
+    {
+      // kodi-rt: files a second kodi.exe was started with (WinMain.cpp), played like files on the command line
+      const auto* data = reinterpret_cast<const COPYDATASTRUCT*>(lParam);
+      if (data == nullptr || data->dwData != COPYDATA_OPEN_FILES || data->lpData == nullptr)
+        break;
+      const std::wstring paths(static_cast<const wchar_t*>(data->lpData),
+                               data->cbData / sizeof(wchar_t));
+      auto* list = new CFileItemList; // deleted by the TMSG_MEDIA_PLAY handler
+      for (const auto& path : StringUtils::Split(FromW(paths), '\n'))
+      {
+        if (!path.empty())
+          list->Add(std::make_shared<CFileItem>(path, false));
+      }
+      if (list->IsEmpty())
+      {
+        delete list;
+        break;
+      }
+      CLog::LogF(LOGINFO, "playing {} file(s) from another kodi.exe", list->Size());
+      CServiceBroker::GetAppMessenger()->PostMsg(TMSG_MEDIA_PLAY, -1, -1, static_cast<void*>(list));
+      return TRUE;
     }
     case WM_TIMER:
     {
