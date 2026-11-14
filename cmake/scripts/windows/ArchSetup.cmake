@@ -16,6 +16,11 @@ set(HOSTTOOLSET ${CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE})
 if(CMAKE_GENERATOR_PLATFORM STREQUAL arm64)
   set(ARCH arm64)
   set(SDK_TARGET_ARCH arm64)
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL arm AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+  # kodi-rt: Windows ARM32 (Windows RT 8.1). Built with Ninja and a toolchain file, where
+  # CMAKE_GENERATOR_PLATFORM is empty, so the toolchain's CMAKE_SYSTEM_PROCESSOR decides.
+  set(ARCH arm)
+  set(SDK_TARGET_ARCH arm)
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
   set(ARCH win32)
   set(SDK_TARGET_ARCH x86)
@@ -39,7 +44,10 @@ set(DEPS_FOLDER_RELATIVE project/BuildDependencies)
 # If we ever allow package.native other than 0_package.native-win32.list we will want to
 # adapt this based on host
 set(NATIVEPREFIX ${CMAKE_SOURCE_DIR}/${DEPS_FOLDER_RELATIVE}/tools)
-set(DEPENDS_PATH ${CMAKE_SOURCE_DIR}/${DEPS_FOLDER_RELATIVE}/${ARCH})
+# kodi-rt: an existing DEPENDS_PATH (-DDEPENDS_PATH=<prefix>) wins over the default folder
+if(NOT DEFINED DEPENDS_PATH)
+  set(DEPENDS_PATH ${CMAKE_SOURCE_DIR}/${DEPS_FOLDER_RELATIVE}/${ARCH})
+endif()
 set(MINGW_LIBS_DIR ${CMAKE_SOURCE_DIR}/${DEPS_FOLDER_RELATIVE}/mingwlibs/${ARCH})
 
 set(Msys_ROOT "${CMAKE_SOURCE_DIR}/${DEPS_FOLDER_RELATIVE}/msys64")
@@ -59,8 +67,8 @@ add_options(CXX ALL_BUILDS "/utf-8")
 add_options(CXX ALL_BUILDS "/wd\"4996\"")
 set(ARCH_DEFINES -D_WINDOWS -DTARGET_WINDOWS -DTARGET_WINDOWS_DESKTOP)
 
-# Do not add SSE flags for ARM64
-if(NOT CMAKE_GENERATOR_PLATFORM STREQUAL arm64)
+# Do not add SSE flags for ARM64 (kodi-rt: nor ARM32)
+if(NOT CMAKE_GENERATOR_PLATFORM STREQUAL arm64 AND NOT ARCH STREQUAL arm)
   list(APPEND ARCH_DEFINES -D__SSE__ -D__SSE2__)
 endif()
 
@@ -99,12 +107,22 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 link_directories(${DEPENDS_PATH}/lib)
 
 # Additional libraries
-list(APPEND DEPLIBS bcrypt d3d11.lib DInput8.lib DSound.lib winmm.lib Mpr.lib Iphlpapi.lib ws2_32
+# kodi-rt: no DInput8.lib for ARM32 (SDK 10.0.19041 has no um\arm\dinput8.lib; no Kodi source uses DirectInput)
+if(NOT ARCH STREQUAL arm)
+  list(APPEND DEPLIBS DInput8.lib)
+endif()
+list(APPEND DEPLIBS bcrypt d3d11.lib DSound.lib winmm.lib Mpr.lib Iphlpapi.lib ws2_32
                     PowrProf.lib setupapi.lib Shlwapi.lib dwmapi.lib dxguid.lib DelayImp.lib RuntimeObject.lib)
 
 # NODEFAULTLIB option
-set(_nodefaultlibs_RELEASE libcmt)
-set(_nodefaultlibs_DEBUG libcmt msvcrt)
+if(CMAKE_MSVC_RUNTIME_LIBRARY STREQUAL "MultiThreaded")
+  # kodi-rt: the static CRT (/MT, kodi-rt's toolchain files), whose library IS libcmt; keep the DLL CRTs out instead
+  set(_nodefaultlibs_RELEASE msvcrt)
+  set(_nodefaultlibs_DEBUG msvcrtd)
+else()
+  set(_nodefaultlibs_RELEASE libcmt)
+  set(_nodefaultlibs_DEBUG libcmt msvcrt)
+endif()
 foreach(_lib ${_nodefaultlibs_RELEASE})
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:\"${_lib}\"")
 endforeach()

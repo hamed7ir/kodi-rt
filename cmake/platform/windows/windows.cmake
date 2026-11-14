@@ -1,4 +1,6 @@
-set(PLATFORM_REQUIRED_DEPS Detours Effects11)
+# kodi-rt: Detours is optional: its only user, the D3D driver hook in WinSystemWin32DX.cpp, is compiled out without it
+set(PLATFORM_REQUIRED_DEPS Effects11)
+list(APPEND PLATFORM_OPTIONAL_DEPS Detours)
 set(PLATFORM_REQUIRED_TOOLS EffectsCompiler Msys)
 
 list(APPEND PLATFORM_OPTIONAL_PACKAGES LibAACS LibBDPlus)
