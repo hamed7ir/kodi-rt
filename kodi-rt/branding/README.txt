@@ -8,3 +8,7 @@ which is false, also make the icon purple not blue"):
                    codename) is no longer lit up among the names.
                    powershell -NoProfile -File scripts\s9-splash.ps1 -In <kodi's splash.jpg> -Out splash.jpg
 They go into the Kodi tree as the fork's branding commit (release-docs/fork/series.tsv).
+  poster-v1.0.png  the README poster (2880x1200), Venetium's poster layout in purple: branding/poster/poster.html
+                   rendered by scripts/s9-poster.ps1 (headless Chrome at 1.5x). Its Kodi screenshots are Kodi's own
+                   (tests/s9/poster-shots.ps1, Estuary's violet colour theme); the 1080p numbers are Hamed's, from the
+                   Surface RT.

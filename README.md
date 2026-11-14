@@ -1,5 +1,7 @@
 # kodi-rt
 
+![kodi-rt 1.0](kodi-rt/branding/poster-v1.0.png)
+
 kodi for old arm windows tablets: windows rt 8.1 on the surface rt (tegra 3). this repo is a fork of kodi, and the
 `kodi-rt` branch is kodi master (23.0 alpha, bffa625c) plus my commits on top. it builds for arm32 (armnt), the
 point of it, and for x64 and x86 too, with python 3.14 for add-ons and skins.
@@ -20,7 +22,8 @@ as venetium. this is not an official kodi build and team kodi has nothing to do 
 
 - estuary, with touch: a tap is a tap, two-finger tap is back, a tap in fullscreen video keeps the controls up, and
   estuary's touch mode is on (arm32)
-- 1080p h.264 plays smooth with hardware decode on the gpu (d3d11 dxva)
+- 1080p h.264 plays smooth with hardware decode on the gpu (d3d11 dxva), at about 10% cpu and 100 mb of ram, so
+  your rt stays cold
 - 720p 10-bit hevc (x265) plays smooth in software on the surface rt: 24 fps with no skipped frames. that needed pgo +
   thinlto, neon for ffmpeg's 10-bit motion compensation, and a fix for a kodi bug that sent every 10-bit frame through
   rgb and back
