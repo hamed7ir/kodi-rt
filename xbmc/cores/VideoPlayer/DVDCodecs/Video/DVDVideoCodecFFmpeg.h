@@ -99,6 +99,7 @@ protected:
   int m_droppedFrames = 0;
   bool m_requestSkipDeint = false;
   int m_codecControlFlags = 0;
+  AVDiscard m_skipLoopFilter = AVDISCARD_DEFAULT;
   bool m_interlaced = false;
   double m_DAR = 1.0;
   CDVDStreamInfo m_hints;

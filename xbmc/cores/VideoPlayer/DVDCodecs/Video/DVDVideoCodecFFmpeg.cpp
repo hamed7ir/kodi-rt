@@ -28,6 +28,7 @@
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
 
+#include <algorithm>
 #include <iterator>
 #include <memory>
 #include <mutex>
@@ -404,6 +405,10 @@ bool CDVDVideoCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
     else
     {
       int num_threads = CServiceBroker::GetCPUInfo()->GetCPUCount() * 3 / 2;
+#if defined(TARGET_WINDOWS) && defined(_M_ARM)
+      // one frame thread per core: more starve the rest of playback on quad-core ARM32 tablets
+      num_threads = CServiceBroker::GetCPUInfo()->GetCPUCount();
+#endif
       num_threads = std::max(1, std::min(num_threads, 16));
       m_pCodecContext->thread_count = num_threads;
       m_decoderState = STATE_SW_MULTI;
@@ -434,6 +439,7 @@ bool CDVDVideoCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
   // advanced setting override for skip loop filter (see avcodec.h for valid options)
   //! @todo allow per video setting?
   int iSkipLoopFilter = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_iSkipLoopFilter;
+  m_skipLoopFilter = static_cast<AVDiscard>(iSkipLoopFilter);
   if (iSkipLoopFilter != 0)
   {
     m_pCodecContext->skip_loop_filter = static_cast<AVDiscard>(iSkipLoopFilter);
@@ -1542,17 +1548,19 @@ void CDVDVideoCodecFFmpeg::SetCodecControl(int flags)
     else
       m_requestSkipDeint = false;
 
+    // the skiploopfilter setting only speeds up software decoding; with DXVA it would just lower quality
+    const AVDiscard skipLoopFilter = m_pHardware ? AVDISCARD_DEFAULT : m_skipLoopFilter;
     if (bDrop)
     {
       m_pCodecContext->skip_frame = AVDISCARD_NONREF;
       m_pCodecContext->skip_idct = AVDISCARD_NONREF;
-      m_pCodecContext->skip_loop_filter = AVDISCARD_NONREF;
+      m_pCodecContext->skip_loop_filter = std::max(AVDISCARD_NONREF, skipLoopFilter);
     }
     else
     {
       m_pCodecContext->skip_frame = AVDISCARD_DEFAULT;
       m_pCodecContext->skip_idct = AVDISCARD_DEFAULT;
-      m_pCodecContext->skip_loop_filter = AVDISCARD_DEFAULT;
+      m_pCodecContext->skip_loop_filter = skipLoopFilter;
     }
   }
 
