@@ -563,7 +563,8 @@ if(FFMPEG_FOUND)
   endforeach()
 
   # Always enable build job for windows. Msys scripts handle rebuild requirements
-  if((WIN32 OR WINDOWS_STORE) AND NOT TARGET ${${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_BUILD_NAME})
+  # kodi-rt: except for an external FFmpeg (-DWITH_FFMPEG/-DFFMPEG_PATH), which that job would replace
+  if((WIN32 OR WINDOWS_STORE) AND NOT FFMPEG_PATH AND NOT TARGET ${${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_BUILD_NAME})
     buildFFMPEG()
   endif()
 
