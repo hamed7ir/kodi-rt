@@ -1191,9 +1191,10 @@ CFileStreamBuffer::pos_type CFileStreamBuffer::seekoff(
     return pos;
 
   // try to seek within buffer
-  if(gptr()+offset2 >= eback() && gptr()+offset2 < egptr())
+  // compare offsets: gptr()+offset2 outside the buffer is undefined and can wrap on 32-bit targets
+  if (offset2 >= eback() - gptr() && offset2 < egptr() - gptr())
   {
-    gbump(offset2);
+    gbump(static_cast<int>(offset2));
     return pos + offset2;
   }
 
