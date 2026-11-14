@@ -427,7 +427,7 @@ bool CExternalPlayer::ExecuteAppW32(const char* strPath, const char* strSwitches
   }
   else
   {
-    int res = WaitForSingleObject(m_processInfo.hProcess, INFINITE);
+    DWORD res = WaitForSingleObject(m_processInfo.hProcess, INFINITE);
 
     switch (res)
     {

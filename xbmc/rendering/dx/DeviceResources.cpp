@@ -54,7 +54,7 @@ namespace winrt
   CLog::LogF(LOGERROR, "function call at line {} ends with error: {}", __LINE__, \
              CWIN32Util::FormatHRESULT(hr));
 #define CHECK_ERR() if (FAILED(hr)) { LOG_HR(hr); breakOnDebug; return; }
-#define RETURN_ERR(ret) if (FAILED(hr)) { LOG_HR(hr); breakOnDebug; return (##ret); }
+#define RETURN_ERR(ret) if (FAILED(hr)) { LOG_HR(hr); breakOnDebug; return (ret); }
 
 bool DX::DeviceResources::CBackBuffer::Acquire(ID3D11Texture2D* pTexture)
 {

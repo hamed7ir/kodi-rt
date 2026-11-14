@@ -35,7 +35,7 @@ struct render_details
   weights_fn weights;
 
   template<class T>
-  constexpr static render_details get(RenderMethod method, const std::string& name)
+  static render_details get(RenderMethod method, const std::string& name)
   {
     return { method, name, T::Create, T::GetWeight };
   }
