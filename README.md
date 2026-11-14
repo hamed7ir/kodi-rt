@@ -81,7 +81,7 @@ other upstreams keep their own licenses (see `kodi-rt/NOTICES.md`).
 
 ## credits
 
-built on kodi (team kodi) and ffmpeg. the installer comes from venetium's. thanks to the openrt community and everyone
+built on kodi (team kodi) and ffmpeg. the installer comes from venetium's. thanks to the windows rt community and everyone
 who tests it.
 
 it was possible with help of claude ai.
