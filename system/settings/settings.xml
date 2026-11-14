@@ -4289,7 +4289,7 @@
         </setting>
         <setting id="lookandfeel.skincolors" type="string" parent="lookandfeel.skin" label="14078" help="36106">
           <level>1</level>
-          <default>SKINDEFAULT</default>
+          <default>violet</default> <!-- kodi-rt: Estuary's violet theme by default -->
           <constraints>
             <options>skincolors</options>
           </constraints>
