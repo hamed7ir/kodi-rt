@@ -121,8 +121,9 @@ void CRenderSystemDX::OnResize()
 bool CRenderSystemDX::IsFormatSupport(DXGI_FORMAT format, unsigned int usage) const
 {
   ComPtr<ID3D11Device1> pD3DDev = m_deviceResources->GetD3DDevice();
-  UINT supported;
-  pD3DDev->CheckFormatSupport(format, &supported);
+  UINT supported = 0;
+  if (FAILED(pD3DDev->CheckFormatSupport(format, &supported)))
+    return false;
   return (supported & usage) != 0;
 }
 
