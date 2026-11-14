@@ -1,0 +1,111 @@
+diff --git a/xbmc/windowing/windows/WinEventsWin32.cpp b/xbmc/windowing/windows/WinEventsWin32.cpp
+index 5538e73..a3c6198 100644
+--- a/xbmc/windowing/windows/WinEventsWin32.cpp
++++ b/xbmc/windowing/windows/WinEventsWin32.cpp
+@@ -81,6 +81,21 @@ int CWinEventsWin32::m_originalZoomDistance = 0;
+ Pointer CWinEventsWin32::m_touchPointer;
+ CGenericTouchSwipeDetector* CWinEventsWin32::m_touchSwipeDetector = nullptr;
+ 
++// kodi-rt: Windows gives touch taps to a desktop app as mouse messages, marked with MI_WP_SIGNATURE
++// (0xFF515700) in GetMessageExtraInfo() and bit 0x80 for touch (not pen). A touch that does not move is
++// passed on as a touch tap or long press, as on Android; one that moves stays a mouse drag.
++namespace
++{
++bool IsTouchMouseMessage()
++{
++  return (static_cast<DWORD>(GetMessageExtraInfo()) & 0xFFFFFF80) == 0xFF515780;
++}
++bool g_touchDown = false;
++bool g_touchDragging = false;
++POINT g_touchDownPos = {};
++constexpr int TOUCH_DRAG_THRESHOLD = 10; // pixels
++} // unnamed namespace
++
+ // register to receive SD card events (insert/remove)
+ // seen at http://www.codeproject.com/Messages/2897423/Re-No-message-triggered-on-SD-card-insertion-remov.aspx
+ #define WM_MEDIA_CHANGE (WM_USER + 666)
+@@ -500,6 +515,27 @@ LRESULT CALLBACK CWinEventsWin32::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
+         DX::Windowing()->ShowOSMouse(true);
+       break;
+     case WM_MOUSEMOVE:
++      if (IsTouchMouseMessage())
++      {
++        // a touch has no hover (Windows moves the pointer to a tap first)
++        if (!g_touchDown)
++          return(0);
++        if (!g_touchDragging)
++        {
++          if (abs(GET_X_LPARAM(lParam) - g_touchDownPos.x) < TOUCH_DRAG_THRESHOLD &&
++              abs(GET_Y_LPARAM(lParam) - g_touchDownPos.y) < TOUCH_DRAG_THRESHOLD)
++            return(0);
++          // it moves: a drag after all, so deliver the press that was held back
++          g_touchDragging = true;
++          newEvent.type = XBMC_MOUSEBUTTONDOWN;
++          newEvent.button.x = static_cast<uint16_t>(g_touchDownPos.x);
++          newEvent.button.y = static_cast<uint16_t>(g_touchDownPos.y);
++          newEvent.button.button = XBMC_BUTTON_LEFT;
++          if (appPort)
++            appPort->OnEvent(newEvent);
++          newEvent = {};
++        }
++      }
+       newEvent.type = XBMC_MOUSEMOTION;
+       newEvent.motion.x = GET_X_LPARAM(lParam);
+       newEvent.motion.y = GET_Y_LPARAM(lParam);
+@@ -509,6 +545,17 @@ LRESULT CALLBACK CWinEventsWin32::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
+     case WM_LBUTTONDOWN:
+     case WM_MBUTTONDOWN:
+     case WM_RBUTTONDOWN:
++      if (IsTouchMouseMessage())
++      {
++        // a touch press waits for its release (a tap) or a move (a drag)
++        if (uMsg == WM_LBUTTONDOWN)
++        {
++          g_touchDown = true;
++          g_touchDragging = false;
++          g_touchDownPos = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
++        }
++        return(0);
++      }
+       newEvent.type = XBMC_MOUSEBUTTONDOWN;
+       newEvent.button.x = GET_X_LPARAM(lParam);
+       newEvent.button.y = GET_Y_LPARAM(lParam);
+@@ -522,6 +569,27 @@ LRESULT CALLBACK CWinEventsWin32::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
+     case WM_LBUTTONUP:
+     case WM_MBUTTONUP:
+     case WM_RBUTTONUP:
++      if (IsTouchMouseMessage() && !(uMsg == WM_LBUTTONUP && g_touchDragging))
++      {
++        const float x = static_cast<float>(GET_X_LPARAM(lParam));
++        const float y = static_cast<float>(GET_Y_LPARAM(lParam));
++        // kodi-rt diagnostic for Stage 5, to remove once done: where a touch lands, with the window
++        // and render sizes (taps in a window seemed to hit a neighbouring list item)
++        RECT client{};
++        GetClientRect(hWnd, &client);
++        auto& gfx = DX::Windowing()->GetGfxContext();
++        CLog::Log(LOGINFO, "kodi-rt touch: {} at {:.0f},{:.0f}, client {}x{}, render {}x{}",
++                  uMsg == WM_RBUTTONUP ? "long press" : "tap", x, y, client.right, client.bottom,
++                  gfx.GetWidth(), gfx.GetHeight());
++        if (uMsg == WM_LBUTTONUP)
++          CGenericTouchActionHandler::GetInstance().OnTap(x, y, 1);
++        else if (uMsg == WM_RBUTTONUP) // press-and-hold
++          CGenericTouchActionHandler::GetInstance().OnLongPress(x, y, 1);
++        g_touchDown = false;
++        return(0);
++      }
++      if (uMsg == WM_LBUTTONUP)
++        g_touchDown = g_touchDragging = false;
+       newEvent.type = XBMC_MOUSEBUTTONUP;
+       newEvent.button.x = GET_X_LPARAM(lParam);
+       newEvent.button.y = GET_Y_LPARAM(lParam);
+@@ -941,8 +1009,8 @@ void CWinEventsWin32::OnGestureNotify(HWND hWnd, LPARAM lParam)
+   GESTURECONFIG gc[] = {{ GID_ZOOM, 0, GC_ZOOM},
+                         { GID_ROTATE, 0, GC_ROTATE},
+                         { GID_PAN, 0, GC_PAN},
+-                        { GID_TWOFINGERTAP, GC_TWOFINGERTAP, GC_TWOFINGERTAP },
+-                        { GID_PRESSANDTAP, GC_PRESSANDTAP, GC_PRESSANDTAP }};
++                        { GID_TWOFINGERTAP, GC_TWOFINGERTAP, 0 }, // kodi-rt: wanted, so not also blocked
++                        { GID_PRESSANDTAP, GC_PRESSANDTAP, 0 }};
+ 
+   // send a message to see if a control wants any
+   int gestures;

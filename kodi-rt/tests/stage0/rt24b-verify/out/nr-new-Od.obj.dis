@@ -1,0 +1,31 @@
+
+Disassembly of section .text:
+
+00000000 <?f@@YAHH@Z>:
+       0: e92d 4800    	push.w	{r11, lr}
+       4: 46eb         	mov	r11, sp
+       6: b082         	sub	sp, #0x8
+       8: 9001         	str	r0, [sp, #0x4]
+       a: 9801         	ldr	r0, [sp, #0x4]
+       c: 2808         	cmp	r0, #0x8
+       e: db04         	blt	0x1a <?f@@YAHH@Z+0x1a>  @ imm = #0x8
+      10: e7ff         	b	0x12 <?f@@YAHH@Z+0x12>  @ imm = #-0x2
+      12: 9801         	ldr	r0, [sp, #0x4]
+      14: f000 f800    	bl	0x18 <?f@@YAHH@Z+0x18>  @ imm = #0x0
+			00000014:  IMAGE_REL_ARM_BRANCH24T	?die@@YAXH@Z
+      18: defe         	trap
+      1a: 9801         	ldr	r0, [sp, #0x4]
+      1c: eb00 0040    	add.w	r0, r0, r0, lsl #1
+      20: b002         	add	sp, #0x8
+      22: e8bd 8800    	pop.w	{r11, pc}
+
+00000026 <?g@@YAXH@Z>:
+      26: e92d 4800    	push.w	{r11, lr}
+      2a: 46eb         	mov	r11, sp
+      2c: b082         	sub	sp, #0x8
+      2e: 9001         	str	r0, [sp, #0x4]
+      30: 9801         	ldr	r0, [sp, #0x4]
+      32: 3001         	adds	r0, #0x1
+      34: f000 f800    	bl	0x38 <?g@@YAXH@Z+0x12>  @ imm = #0x0
+			00000034:  IMAGE_REL_ARM_BRANCH24T	?die@@YAXH@Z
+      38: defe         	trap

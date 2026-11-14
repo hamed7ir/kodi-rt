@@ -1,0 +1,130 @@
+diff --git a/xbmc/platform/win32/WinMain.cpp b/xbmc/platform/win32/WinMain.cpp
+index 6b907fa..2e732ee 100644
+--- a/xbmc/platform/win32/WinMain.cpp
++++ b/xbmc/platform/win32/WinMain.cpp
+@@ -7,6 +7,8 @@
+  */
+ 
+ #include "CompileInfo.h"
++#include "FileItem.h"
++#include "FileItemList.h"
+ #include "ServiceBroker.h"
+ #include "application/AppEnvironment.h"
+ #include "application/AppParamParser.h"
+@@ -16,6 +18,7 @@
+ #include "threads/Thread.h"
+ #include "utils/CharsetConverter.h" // Required to initialize converters before usage
+ #include "utils/Digest.h"
++#include "windowing/windows/WinEventsWin32.h"
+ 
+ #include "platform/win32/CharsetConverter.h"
+ #include "platform/win32/WIN32Util.h"
+@@ -153,6 +156,43 @@ bool CheckAndSetProfileMutex(UserDirectoriesLocation loc, HANDLE& handle)
+ 
+   return false;
+ }
++
++/*!
++ * \brief kodi-rt: hand the files of this command line to the running instance, which plays them.
++ *
++ * \param[in] hwnd the running instance's window
++ * \param[in] files the files given on the command line
++ */
++void SendFilesToRunningInstance(HWND hwnd, const CFileItemList& files)
++{
++  std::wstring paths;
++  for (const auto& item : files)
++  {
++    std::wstring path = ToW(item->GetPath());
++    // a relative path is relative to this process's current folder, not the running Kodi's
++    if (path.find(L"://") == std::wstring::npos)
++    {
++      const DWORD size = GetFullPathNameW(path.c_str(), 0, nullptr, nullptr);
++      if (size > 0)
++      {
++        std::wstring full(size, L'\0');
++        const DWORD len = GetFullPathNameW(path.c_str(), size, full.data(), nullptr);
++        if (len > 0 && len < size)
++          path = full.substr(0, len);
++      }
++    }
++    paths += path;
++    paths += L'\n';
++  }
++  if (paths.empty())
++    return;
++
++  COPYDATASTRUCT data{CWinEventsWin32::COPYDATA_OPEN_FILES,
++                      static_cast<DWORD>(paths.size() * sizeof(wchar_t)), paths.data()};
++  DWORD_PTR result{0};
++  SendMessageTimeoutW(hwnd, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&data), SMTO_ABORTIFHUNG,
++                      5000, &result);
++}
+ } // namespace
+ 
+ //-----------------------------------------------------------------------------
+@@ -229,6 +269,7 @@ _Use_decl_annotations_ INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+       // switch to the running instance
+       ShowWindow(hwnd, SW_RESTORE);
+       SetForegroundWindow(hwnd);
++      SendFilesToRunningInstance(hwnd, params->GetPlaylist());
+     }
+     status = 0;
+     goto cleanup;
+diff --git a/xbmc/windowing/windows/WinEventsWin32.cpp b/xbmc/windowing/windows/WinEventsWin32.cpp
+index a3c6198..b0d3440 100644
+--- a/xbmc/windowing/windows/WinEventsWin32.cpp
++++ b/xbmc/windowing/windows/WinEventsWin32.cpp
+@@ -11,6 +11,8 @@
+ #endif
+ #include "WinEventsWin32.h"
+ 
++#include "FileItem.h"
++#include "FileItemList.h"
+ #include "ServiceBroker.h"
+ #include "Util.h"
+ #include "WinKeyMap.h"
+@@ -941,6 +943,29 @@ LRESULT CALLBACK CWinEventsWin32::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
+       }
+       break;
+     }
++    case WM_COPYDATA:
++    {
++      // kodi-rt: files a second kodi.exe was started with (WinMain.cpp), played like files on the command line
++      const auto* data = reinterpret_cast<const COPYDATASTRUCT*>(lParam);
++      if (data == nullptr || data->dwData != COPYDATA_OPEN_FILES || data->lpData == nullptr)
++        break;
++      const std::wstring paths(static_cast<const wchar_t*>(data->lpData),
++                               data->cbData / sizeof(wchar_t));
++      auto* list = new CFileItemList; // deleted by the TMSG_MEDIA_PLAY handler
++      for (const auto& path : StringUtils::Split(FromW(paths), '\n'))
++      {
++        if (!path.empty())
++          list->Add(std::make_shared<CFileItem>(path, false));
++      }
++      if (list->IsEmpty())
++      {
++        delete list;
++        break;
++      }
++      CLog::LogF(LOGINFO, "playing {} file(s) from another kodi.exe", list->Size());
++      CServiceBroker::GetAppMessenger()->PostMsg(TMSG_MEDIA_PLAY, -1, -1, static_cast<void*>(list));
++      return TRUE;
++    }
+     case WM_TIMER:
+     {
+       if (wParam == ID_TIMER_HDR)
+diff --git a/xbmc/windowing/windows/WinEventsWin32.h b/xbmc/windowing/windows/WinEventsWin32.h
+index 466c755..a453492 100644
+--- a/xbmc/windowing/windows/WinEventsWin32.h
++++ b/xbmc/windowing/windows/WinEventsWin32.h
+@@ -16,6 +16,9 @@ class CGenericTouchSwipeDetector;
+ class CWinEventsWin32 : public IWinEvents
+ {
+ public:
++  // kodi-rt: WM_COPYDATA id for files a second kodi.exe hands to the running one (WinMain.cpp)
++  static constexpr ULONG_PTR COPYDATA_OPEN_FILES = 0x4B4F4446; // "KODF"
++
+   bool MessagePump() override;
+   static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+ 

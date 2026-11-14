@@ -1,0 +1,21 @@
+diff --git a/cmake/modules/FindFriBidi.cmake b/cmake/modules/FindFriBidi.cmake
+index cf1a74a..8a9ba8d 100644
+--- a/cmake/modules/FindFriBidi.cmake
++++ b/cmake/modules/FindFriBidi.cmake
+@@ -101,6 +101,16 @@ if(NOT TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME})
+       set_target_properties(${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME} PROPERTIES LIB_BUILD ON)
+     endif()
+ 
++    # kodi-rt: the Windows libass config (tools/depends/target/libass/01-win-CMakeLists.patch) links
++    # FriBidi::FriBidi; provide it, as FindFreeType provides Freetype::Freetype
++    if(NOT TARGET FriBidi::FriBidi)
++      get_target_property(_fribidi_target ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME} ALIASED_TARGET)
++      if(NOT _fribidi_target)
++        set(_fribidi_target ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME})
++      endif()
++      add_library(FriBidi::FriBidi ALIAS ${_fribidi_target})
++    endif()
++
+     if(TARGET ${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_BUILD_NAME)
+       ADD_MULTICONFIG_BUILDMACRO()
+     endif()

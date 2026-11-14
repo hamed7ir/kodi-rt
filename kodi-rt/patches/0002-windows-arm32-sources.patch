@@ -1,0 +1,56 @@
+diff --git a/xbmc/addons/addoninfo/AddonInfoBuilder.cpp b/xbmc/addons/addoninfo/AddonInfoBuilder.cpp
+index c6a23c5..f2e7748 100644
+--- a/xbmc/addons/addoninfo/AddonInfoBuilder.cpp
++++ b/xbmc/addons/addoninfo/AddonInfoBuilder.cpp
+@@ -843,6 +843,8 @@ bool CAddonInfoBuilder::PlatformSupportsAddon(const AddonInfoPtr& addon)
+     "windows-x86_64",
+ #elif defined(_M_ARM64)
+     "windows-arm64",
++#elif defined(_M_ARM)
++    "windows-arm", // kodi-rt: Windows RT 8.1 (ARM32)
+ #else
+ #error no architecture dependant platform tag
+ #endif
+diff --git a/xbmc/platform/win32/CPUInfoWin32.cpp b/xbmc/platform/win32/CPUInfoWin32.cpp
+index 8a57430..a41cfb2 100644
+--- a/xbmc/platform/win32/CPUInfoWin32.cpp
++++ b/xbmc/platform/win32/CPUInfoWin32.cpp
+@@ -124,7 +124,7 @@ CCPUInfoWin32::CCPUInfoWin32()
+   else
+     m_cpuQueryLoad = nullptr;
+ 
+-#ifndef _M_ARM64
++#if !defined(_M_ARM64) && !defined(_M_ARM) // kodi-rt: __cpuid is x86/x64 only
+   int CPUInfo[4] = {}; // receives EAX, EBX, ECD and EDX in that order
+ 
+   __cpuid(CPUInfo, 0);
+diff --git a/xbmc/platform/win32/threads/Win32Exception.cpp b/xbmc/platform/win32/threads/Win32Exception.cpp
+index 3622f3b..50a0790 100644
+--- a/xbmc/platform/win32/threads/Win32Exception.cpp
++++ b/xbmc/platform/win32/threads/Win32Exception.cpp
+@@ -209,6 +209,11 @@ bool win32_exception::write_stacktrace(EXCEPTION_POINTERS* pEp)
+   frame.AddrPC.Offset = pEp->ContextRecord->Eip; // Current location in program
+   frame.AddrStack.Offset = pEp->ContextRecord->Esp; // Stack pointers current value
+   frame.AddrFrame.Offset = pEp->ContextRecord->Ebp; // Value of register used to access local function variables.
++#elif defined(_M_ARM)
++  // kodi-rt: Windows ARM32 CONTEXT: Pc, Sp, and R11 as the frame pointer
++  frame.AddrPC.Offset = pEp->ContextRecord->Pc; // Current location in program
++  frame.AddrStack.Offset = pEp->ContextRecord->Sp; // Stack pointers current value
++  frame.AddrFrame.Offset = pEp->ContextRecord->R11; // Value of register used to access local function variables.
+ #elif defined(_M_ARM64)
+   frame.AddrPC.Offset = pEp->ContextRecord->Pc; // Current location in program
+   frame.AddrStack.Offset = pEp->ContextRecord->Sp; // Stack pointers current value
+@@ -241,7 +246,12 @@ bool win32_exception::write_stacktrace(EXCEPTION_POINTERS* pEp)
+                                   GetCurrentProcessId());
+   WriteFile(hDumpFile, strOutput.c_str(), strOutput.size(), &dwBytes, NULL);
+ 
+-  while(pSW(IMAGE_FILE_MACHINE_I386, hCurProc, GetCurrentThread(), &frame, pEp->ContextRecord, NULL, pSFTA, pSGMB, NULL))
++#if defined(_M_ARM)
++  const DWORD stackWalkMachine = IMAGE_FILE_MACHINE_ARMNT; // kodi-rt
++#else
++  const DWORD stackWalkMachine = IMAGE_FILE_MACHINE_I386;
++#endif
++  while(pSW(stackWalkMachine, hCurProc, GetCurrentThread(), &frame, pEp->ContextRecord, NULL, pSFTA, pSGMB, NULL))
+   {
+     if(frame.AddrPC.Offset != 0)
+     {

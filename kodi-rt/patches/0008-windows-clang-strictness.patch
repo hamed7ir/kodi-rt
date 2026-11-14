@@ -1,0 +1,39 @@
+diff --git a/xbmc/cores/ExternalPlayer/ExternalPlayer.cpp b/xbmc/cores/ExternalPlayer/ExternalPlayer.cpp
+index e032c12..042b9bf 100644
+--- a/xbmc/cores/ExternalPlayer/ExternalPlayer.cpp
++++ b/xbmc/cores/ExternalPlayer/ExternalPlayer.cpp
+@@ -427,7 +427,7 @@ bool CExternalPlayer::ExecuteAppW32(const char* strPath, const char* strSwitches
+   }
+   else
+   {
+-    int res = WaitForSingleObject(m_processInfo.hProcess, INFINITE);
++    DWORD res = WaitForSingleObject(m_processInfo.hProcess, INFINITE);
+ 
+     switch (res)
+     {
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/WinRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/WinRenderer.cpp
+index 299741e..653334f 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/WinRenderer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/WinRenderer.cpp
+@@ -35,7 +35,7 @@ struct render_details
+   weights_fn weights;
+ 
+   template<class T>
+-  constexpr static render_details get(RenderMethod method, const std::string& name)
++  static render_details get(RenderMethod method, const std::string& name)
+   {
+     return { method, name, T::Create, T::GetWeight };
+   }
+diff --git a/xbmc/rendering/dx/DeviceResources.cpp b/xbmc/rendering/dx/DeviceResources.cpp
+index 77669e9..1c1dd2a 100644
+--- a/xbmc/rendering/dx/DeviceResources.cpp
++++ b/xbmc/rendering/dx/DeviceResources.cpp
+@@ -54,7 +54,7 @@ namespace winrt
+   CLog::LogF(LOGERROR, "function call at line {} ends with error: {}", __LINE__, \
+              CWIN32Util::FormatHRESULT(hr));
+ #define CHECK_ERR() if (FAILED(hr)) { LOG_HR(hr); breakOnDebug; return; }
+-#define RETURN_ERR(ret) if (FAILED(hr)) { LOG_HR(hr); breakOnDebug; return (##ret); }
++#define RETURN_ERR(ret) if (FAILED(hr)) { LOG_HR(hr); breakOnDebug; return (ret); }
+ 
+ bool DX::DeviceResources::CBackBuffer::Acquire(ID3D11Texture2D* pTexture)
+ {

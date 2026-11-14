@@ -1,0 +1,41 @@
+diff --git a/xbmc/cores/VideoPlayer/Process/windows/ProcessInfoWin.cpp b/xbmc/cores/VideoPlayer/Process/windows/ProcessInfoWin.cpp
+index eaa6d77..26ba021 100644
+--- a/xbmc/cores/VideoPlayer/Process/windows/ProcessInfoWin.cpp
++++ b/xbmc/cores/VideoPlayer/Process/windows/ProcessInfoWin.cpp
+@@ -9,6 +9,7 @@
+ #include "ProcessInfoWin.h"
+ 
+ #include "cores/VideoPlayer/Process/ProcessInfo.h"
++#include "rendering/dx/RenderContext.h"
+ 
+ using namespace VIDEOPLAYER;
+ 
+@@ -29,6 +30,12 @@ EINTERLACEMETHOD CProcessInfoWin::GetFallbackDeintMethod()
+ 
+ std::vector<AVPixelFormat> CProcessInfoWin::GetRenderFormats()
+ {
++  // 10/16-bit frames need R16_UNORM (shader renderer) or P010 (DXVA renderer) textures. Without them
++  // (feature level 9_x GPUs), let the codec convert to 8 bits rather than the software renderer to RGB.
++  if (!DX::Windowing()->IsFormatSupport(DXGI_FORMAT_R16_UNORM, D3D11_FORMAT_SUPPORT_TEXTURE2D) &&
++      !DX::Windowing()->IsFormatSupport(DXGI_FORMAT_P010, D3D11_FORMAT_SUPPORT_TEXTURE2D))
++    return {AV_PIX_FMT_D3D11VA_VLD, AV_PIX_FMT_YUV420P, AV_PIX_FMT_NV12};
++
+   return {
+     AV_PIX_FMT_D3D11VA_VLD,
+     AV_PIX_FMT_NV12,
+diff --git a/xbmc/rendering/dx/RenderSystemDX.cpp b/xbmc/rendering/dx/RenderSystemDX.cpp
+index 3a4ed85..4bbd775 100644
+--- a/xbmc/rendering/dx/RenderSystemDX.cpp
++++ b/xbmc/rendering/dx/RenderSystemDX.cpp
+@@ -121,8 +121,9 @@ void CRenderSystemDX::OnResize()
+ bool CRenderSystemDX::IsFormatSupport(DXGI_FORMAT format, unsigned int usage) const
+ {
+   ComPtr<ID3D11Device1> pD3DDev = m_deviceResources->GetD3DDevice();
+-  UINT supported;
+-  pD3DDev->CheckFormatSupport(format, &supported);
++  UINT supported = 0;
++  if (FAILED(pD3DDev->CheckFormatSupport(format, &supported)))
++    return false;
+   return (supported & usage) != 0;
+ }
+ 

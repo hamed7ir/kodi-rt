@@ -1,0 +1,29 @@
+#!/bin/sh
+# kodi-rt: clang-cl for autotools builds (libiconv, ...), Windows ARM32, rt2.4. It is named "clang-cl" so that
+# automake's build-aux/compile recognises it and translates gcc-style options (-o, -l, -L) for it.
+# Compile flags: cross/arm32-msvc.rsp (target, MSVC 14.44, SDK 10.0.26100.0 headers), /MT comes from CFLAGS.
+# When it links (no -c, /c, -E, /E, -EP, /EP, -P, /P), lld-link gets -machine:arm and the 10.0.19041.0 ARM32 library
+# paths, appended last, inside an existing /link section or a new one.
+link=1; haslink=0
+for a in "$@"; do
+  case $a in
+    -c|/c|-E|/E|-EP|/EP|-P|/P) link=0 ;;
+    -link|/link|-LINK|/LINK) haslink=1 ;;
+  esac
+done
+if [ $link = 1 ]; then
+  # The linker options go inline: clang-cl expands an @rsp placed after /link as COMPILER arguments, so a
+  # "/link @arm32-link.rsp" never reaches lld-link (measured). They are the same as cross/arm32-link.rsp.
+  # MSYS2 rewrites a bare "/link" argument into the path D:/MSYS2/link, and clang-cl does not read "-link" as /link:
+  # exclude "/link" and the -libpath: options from MSYS2's argument conversion (other arguments are still converted).
+  export MSYS2_ARG_CONV_EXCL="/link;-libpath:"
+  LP1="-libpath:D:/Program Files/vs22buildtools/VC/Tools/MSVC/14.44.35207/lib/arm"
+  LP2="-libpath:D:/Windows Kits/10/Lib/10.0.19041.0/ucrt/arm"
+  LP3="-libpath:D:/Windows Kits/10/Lib/10.0.19041.0/um/arm"
+  if [ $haslink = 1 ]; then
+    exec "F:/kodi-rt/tc/rt24b-cr/bin/clang-cl.exe" "@F:/kodi-rt/cross/arm32-msvc.rsp" -fuse-ld=lld "$@" -machine:arm "$LP1" "$LP2" "$LP3"
+  else
+    exec "F:/kodi-rt/tc/rt24b-cr/bin/clang-cl.exe" "@F:/kodi-rt/cross/arm32-msvc.rsp" -fuse-ld=lld "$@" /link -machine:arm "$LP1" "$LP2" "$LP3"
+  fi
+fi
+exec "F:/kodi-rt/tc/rt24b-cr/bin/clang-cl.exe" "@F:/kodi-rt/cross/arm32-msvc.rsp" "$@"

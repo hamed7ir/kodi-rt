@@ -1,0 +1,46 @@
+
+Disassembly of section .text:
+
+00000000 <?g@@YAHXZ>:
+       0: b540         	push	{r6, lr}
+       2: b086         	sub	sp, #0x18
+       4: 466e         	mov	r6, sp
+       6: f06f 0c01    	mvn	r12, #0x1
+       a: f8c6 c000    	str.w	r12, [r6]
+       e: f8c6 c004    	str.w	r12, [r6, #0x4]
+      12: f000 f800    	bl	0x16 <?g@@YAHXZ+0x16>   @ imm = #0x0
+			00000012:  IMAGE_REL_ARM_BRANCH24T	?f@@YAXXZ
+      16: 2000         	movs	r0, #0x0
+      18: 60f0         	str	r0, [r6, #0xc]
+      1a: e7ff         	b	0x1c <$ehgcr_0_2>       @ imm = #-0x2
+
+0000001c <$ehgcr_0_2>:
+      1c: 68f0         	ldr	r0, [r6, #0xc]
+      1e: b006         	add	sp, #0x18
+      20: bd40         	pop	{r6, pc}
+
+00000022 <?catch$3@?0??g@@YAHXZ@4HA>:
+      22: b540         	push	{r6, lr}
+      24: b086         	sub	sp, #0x18
+      26: 6930         	ldr	r0, [r6, #0x10]
+      28: 6800         	ldr	r0, [r0]
+      2a: 60f0         	str	r0, [r6, #0xc]
+      2c: f240 001c    	movw	r0, #0x1c
+			0000002c:  IMAGE_REL_ARM_MOV32T	.text
+      30: f2c0 0000    	movt	r0, #0x0
+      34: b006         	add	sp, #0x18
+      36: e8bd 4040    	pop.w	{r6, lr}
+      3a: 4770         	bx	lr
+
+0000003c <?catch$4@?0??g@@YAHXZ@4HA>:
+      3c: b540         	push	{r6, lr}
+      3e: b086         	sub	sp, #0x18
+      40: 6970         	ldr	r0, [r6, #0x14]
+      42: 6801         	ldr	r1, [r0]
+      44: 3164         	adds	r1, #0x64
+      46: 6001         	str	r1, [r0]
+      48: 2000         	movs	r0, #0x0
+      4a: 2100         	movs	r1, #0x0
+      4c: f000 f800    	bl	0x50 <?catch$4@?0??g@@YAHXZ@4HA+0x14> @ imm = #0x0
+			0000004c:  IMAGE_REL_ARM_BRANCH24T	_CxxThrowException
+      50: defe         	trap

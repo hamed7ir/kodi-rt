@@ -1,0 +1,64 @@
+
+Disassembly of section .text:
+
+00000000 <?after_catchret@@YAHH@Z>:
+       0: e92d 4850    	push.w	{r4, r6, r11, lr}
+       4: b088         	sub	sp, #0x20
+       6: 466e         	mov	r6, sp
+       8: f06f 0c01    	mvn	r12, #0x1
+       c: f8c6 c000    	str.w	r12, [r6]
+      10: f8c6 c004    	str.w	r12, [r6, #0x4]
+      14: 61f0         	str	r0, [r6, #0x1c]
+      16: f106 001c    	add.w	r0, r6, #0x1c
+      1a: f240 0100    	movw	r1, #0x0
+			0000001a:  IMAGE_REL_ARM_MOV32T	_TI1H
+      1e: f2c0 0100    	movt	r1, #0x0
+      22: f000 f800    	bl	0x26 <?after_catchret@@YAHH@Z+0x26> @ imm = #0x0
+			00000022:  IMAGE_REL_ARM_BRANCH24T	_CxxThrowException
+      26: e00d         	b	0x44 <$ehgcr_0_1+0x1c>  @ imm = #0x1a
+
+00000028 <$ehgcr_0_1>:
+      28: 68f4         	ldr	r4, [r6, #0xc]
+      2a: 4620         	mov	r0, r4
+      2c: f000 f800    	bl	0x30 <$ehgcr_0_1+0x8>   @ imm = #0x0
+			0000002c:  IMAGE_REL_ARM_BRANCH24T	?side@@YAXH@Z
+      30: 1c60         	adds	r0, r4, #0x1
+      32: 6170         	str	r0, [r6, #0x14]
+      34: f106 0014    	add.w	r0, r6, #0x14
+      38: f240 0100    	movw	r1, #0x0
+			00000038:  IMAGE_REL_ARM_MOV32T	_TI1H
+      3c: f2c0 0100    	movt	r1, #0x0
+      40: f000 f800    	bl	0x44 <$ehgcr_0_1+0x1c>  @ imm = #0x0
+			00000040:  IMAGE_REL_ARM_BRANCH24T	_CxxThrowException
+      44: defe         	trap
+
+00000046 <$ehgcr_0_4>:
+      46: 68f0         	ldr	r0, [r6, #0xc]
+      48: eb00 0080    	add.w	r0, r0, r0, lsl #2
+      4c: 0040         	lsls	r0, r0, #0x1
+      4e: b008         	add	sp, #0x20
+      50: e8bd 8850    	pop.w	{r4, r6, r11, pc}
+
+00000054 <?catch$5@?0??after_catchret@@YAHH@Z@4HA>:
+      54: e92d 4850    	push.w	{r4, r6, r11, lr}
+      58: b088         	sub	sp, #0x20
+      5a: 69b0         	ldr	r0, [r6, #0x18]
+      5c: 60f0         	str	r0, [r6, #0xc]
+      5e: f240 0028    	movw	r0, #0x28
+			0000005e:  IMAGE_REL_ARM_MOV32T	.text
+      62: f2c0 0000    	movt	r0, #0x0
+      66: b008         	add	sp, #0x20
+      68: e8bd 4850    	pop.w	{r4, r6, r11, lr}
+      6c: 4770         	bx	lr
+
+0000006e <?catch$6@?0??after_catchret@@YAHH@Z@4HA>:
+      6e: e92d 4850    	push.w	{r4, r6, r11, lr}
+      72: b088         	sub	sp, #0x20
+      74: 6930         	ldr	r0, [r6, #0x10]
+      76: 60f0         	str	r0, [r6, #0xc]
+      78: f240 0046    	movw	r0, #0x46
+			00000078:  IMAGE_REL_ARM_MOV32T	.text
+      7c: f2c0 0000    	movt	r0, #0x0
+      80: b008         	add	sp, #0x20
+      82: e8bd 4850    	pop.w	{r4, r6, r11, lr}
+      86: 4770         	bx	lr

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- kodi-rt (2026-11-12): touch on a Windows RT tablet with no keyboard. A user keymap: Kodi loads it after
+     system/keymaps/touchscreen.xml, and its entries replace the same gestures there.
+     1. Back. Kodi's touch "Back" is a two-finger swipe to the left, which never happens on Windows: Kodi's Windows
+        gesture code (xbmc/windowing/windows/WinEventsWin32.cpp) hands every pan to the swipe detector as one finger.
+        A two-finger tap does arrive (GID_TWOFINGERTAP), so here it is Back, everywhere. A long press still opens the
+        context menu, which the two-finger tap used to do.
+     2. Video controls. In fullscreen video a tap opens the controls for 3 seconds, kept open only while a mouse is
+        moving (CGUIWindowFullScreen::TriggerOSD). Here a tap opens them until you close them: Kodi's "OSD" action,
+        without the auto-close. Tap a control to use it; a two-finger tap closes the controls (Back), and a
+        two-finger tap without them leaves fullscreen video (it keeps playing; stop it with the controls' stop button). -->
+<keymap>
+  <global>
+    <touch>
+      <tap pointers="2">Back</tap>
+    </touch>
+  </global>
+  <FullScreenVideo>
+    <touch>
+      <tap>OSD</tap>
+      <tap pointers="2">Back</tap>
+    </touch>
+  </FullScreenVideo>
+</keymap>

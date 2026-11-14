@@ -1,0 +1,11 @@
+h2 /O2: objects differ, disassembly+relocations identical; new: 0 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 0)
+h2 /Od: objects differ, disassembly+relocations identical; new: 0 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 0)
+h3 /O2: objects differ, disassembly+relocations identical; new: 0 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 0)
+h3 /Od: objects differ, disassembly+relocations identical; new: 0 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 0)
+cr /O2: objects differ, disassembly+relocations identical; new: 1 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 1)
+cr /Od: objects differ, disassembly+relocations identical; new: 1 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 0)
+nr /O2: objects differ, disassembly+relocations identical; new: 2 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 2)
+nr /Od: objects differ, disassembly+relocations identical; new: 2 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 1)
+rt /O2: objects differ, disassembly+relocations identical; new: 1 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 1)
+rt /Od: objects differ, disassembly+relocations identical; new: 1 traps, 0 symbols ending in a call (run-3 rt2.4 without the flag: 0)
+AB-REPROS OK

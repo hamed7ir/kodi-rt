@@ -1,0 +1,141 @@
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+index d4945bc..921861d 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
+@@ -24,6 +24,7 @@
+ #include "windowing/WinSystem.h"
+ 
+ #include <algorithm>
++#include <chrono>
+ #include <iomanip>
+ #include <iterator>
+ #include <memory>
+@@ -33,6 +34,37 @@
+ 
+ using namespace std::chrono_literals;
+ 
++namespace
++{
++// kodi-rt diagnostic for Stage 5, to remove once done: the video thread's work per 5 s, at info level
++enum class RtVideoEvent
++{
++  Picture,
++  Shown,
++  LateSkip,
++  SkippedPacket,
++  Count
++};
++
++void KodiRtVideoStat(RtVideoEvent ev)
++{
++  static int counts[static_cast<int>(RtVideoEvent::Count)] = {};
++  static auto since = std::chrono::steady_clock::now();
++  counts[static_cast<int>(ev)]++;
++  const auto now = std::chrono::steady_clock::now();
++  if (now - since >= 5s)
++  {
++    CLog::Log(LOGINFO,
++              "kodi-rt video: {} pictures from the decoder, {} shown, {} late skips ({} packets "
++              "skipped) in {:.1f} s",
++              counts[0], counts[1], counts[2], counts[3],
++              std::chrono::duration<double>(now - since).count());
++    std::fill(std::begin(counts), std::end(counts), 0);
++    since = now;
++  }
++}
++} // namespace
++
+ class CDVDMsgVideoCodecChange : public CDVDMsg
+ {
+ public:
+@@ -604,12 +636,14 @@ void CVideoPlayerVideo::Process()
+                       "CVideoPlayerVideo - video late by {}ms, skipping to next keyframe",
+                       DVD_TIME_TO_MSEC(lateness));
+             m_skipToKeyFrame = true;
++            KodiRtVideoStat(RtVideoEvent::LateSkip);
+           }
+         }
+       }
+       if (m_skipToKeyFrame)
+       {
+         m_iDroppedFrames++;
++        KodiRtVideoStat(RtVideoEvent::SkippedPacket);
+         continue;
+       }
+ 
+@@ -844,6 +878,7 @@ bool CVideoPlayerVideo::ProcessDecoderOutput(double &frametime, double &pts)
+       pts += m_picture.iDuration * m_speed / abs(m_speed);
+ 
+     m_outputSate = OutputPicture(&m_picture);
++    KodiRtVideoStat(RtVideoEvent::Picture);
+ 
+     if (m_outputSate == OUTPUT_AGAIN)
+     {
+@@ -1058,6 +1093,7 @@ CVideoPlayerVideo::EOutputState CVideoPlayerVideo::OutputPicture(const VideoPict
+     return OUTPUT_DROPPED;
+   }
+ 
++  KodiRtVideoStat(RtVideoEvent::Shown);
+   return OUTPUT_NORMAL;
+ }
+ 
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/windows/RendererBase.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/windows/RendererBase.cpp
+index 7435908..bf2cd6c 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/windows/RendererBase.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/windows/RendererBase.cpp
+@@ -24,6 +24,9 @@
+ #include "utils/log.h"
+ #include "windowing/GraphicContext.h"
+ 
++#include <algorithm>
++#include <chrono>
++
+ using namespace Microsoft::WRL;
+ 
+ namespace
+@@ -270,9 +273,29 @@ void CRendererBase::Render(int index,
+                            const CRect& viewRect,
+                            unsigned flags)
+ {
++  // kodi-rt diagnostic for Stage 5, to remove once done: video renders and their main-thread time per 5 s
++  static int s_calls = 0;
++  static int64_t s_totalUs = 0, s_maxUs = 0;
++  static auto s_since = std::chrono::steady_clock::now();
++  const auto t0 = std::chrono::steady_clock::now();
++
+   m_iBufferIndex = index;
+   ManageTextures();
+   Render(target, sourceRect, destRect, viewRect, flags);
++
++  const auto t1 = std::chrono::steady_clock::now();
++  const int64_t us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
++  s_calls++;
++  s_totalUs += us;
++  s_maxUs = std::max(s_maxUs, us);
++  if (t1 - s_since >= std::chrono::seconds(5))
++  {
++    CLog::Log(LOGINFO, "kodi-rt render: {} video renders in {:.1f} s, {} us each on average, {} us at most",
++              s_calls, std::chrono::duration<double>(t1 - s_since).count(), s_totalUs / s_calls, s_maxUs);
++    s_calls = 0;
++    s_totalUs = s_maxUs = 0;
++    s_since = t1;
++  }
+ }
+ 
+ void CRendererBase::Render(CD3DTexture& target, const CRect& sourceRect, const CRect& destRect, const CRect& viewRect, unsigned flags)
+diff --git a/xbmc/platform/win32/WinMain.cpp b/xbmc/platform/win32/WinMain.cpp
+index ded0b21..6b907fa 100644
+--- a/xbmc/platform/win32/WinMain.cpp
++++ b/xbmc/platform/win32/WinMain.cpp
+@@ -186,6 +186,11 @@ _Use_decl_annotations_ INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+     SetUnhandledExceptionFilter(CreateMiniDump);
+   }
+ 
++#if defined(_M_ARM)
++  // the main thread renders GUI and video; software video decoding starves it on quad-core ARM32 otherwise
++  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
++#endif
++
+   int status{0};
+   HRESULT hrCOM{E_FAIL};
+   int rcWinsock{WSANOTINITIALISED};

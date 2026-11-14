@@ -1,0 +1,225 @@
+	.syntax	unified
+	.def	"@feat.00";
+	.scl	3;
+	.type	0;
+	.endef
+	.globl	"@feat.00"
+"@feat.00" = 0
+	.file	"rt.cpp"
+	.def	"?g@@YAHXZ";
+	.scl	2;
+	.type	32;
+	.endef
+	.text
+	.globl	"?g@@YAHXZ"                     @ -- Begin function ?g@@YAHXZ
+	.p2align	1
+	.code	16
+	.thumb_func
+"?g@@YAHXZ":                            @ @"?g@@YAHXZ"
+$Mfunc_begin0:
+.seh_proc "?g@@YAHXZ"
+	.seh_handler __CxxFrameHandler3, %unwind, %except
+@ %bb.0:
+	push.w	{r6, r7, r11, lr}
+	.seh_save_regs_w	{r6-r7, r11, lr}
+	add.w	r11, sp, #8
+	.seh_nop_w
+	sub	sp, #24
+	.seh_stackalloc	24
+	.seh_endprologue
+	mov	r6, sp
+	mvn	r12, #1
+	str.w	r12, [r6]
+	str.w	r12, [r6, #4]
+	movs	r0, #0
+	str	r0, [r6, #20]
+$Mtmp0:                                 @ EH_LABEL
+	bl	"?f@@YAXXZ"
+$Mtmp1:                                 @ EH_LABEL
+	b	$MBB0_30
+$MBB0_3:                                @ Block address taken
+$ehgcr_0_1:
+	b	$MBB0_2
+$MBB0_2:
+	ldr	r0, [r6, #20]
+	.seh_startepilogue
+	add	sp, #24
+	.seh_stackalloc	24
+	pop.w	{r6, r7, r11, pc}
+	.seh_save_regs_w	{r6-r7, r11, lr}
+	.seh_endepilogue
+$MBB0_30:
+	b	$MBB0_2
+	.seh_handlerdata
+	.long	"$cppxdata$?g@@YAHXZ"@imgrel
+	.text
+	.seh_endproc
+	.def	"?catch$4@?0??g@@YAHXZ@4HA";
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	1
+"?catch$4@?0??g@@YAHXZ@4HA":
+.seh_proc "?catch$4@?0??g@@YAHXZ@4HA"
+	.seh_handler __CxxFrameHandler3, %unwind, %except
+$MBB0_4:
+	push.w	{r6, r7, r11, lr}
+	.seh_save_regs_w	{r6-r7, r11, lr}
+	add.w	r11, sp, #8
+	.seh_nop_w
+	sub	sp, #24
+	.seh_stackalloc	24
+	.seh_endprologue
+	ldr	r1, [r6, #16]
+	ldr	r0, [r1]
+	adds	r0, #100
+	str	r0, [r1]
+$Mtmp2:                                 @ EH_LABEL
+	movs	r1, #0
+	mov	r0, r1
+	bl	_CxxThrowException
+$Mtmp3:                                 @ EH_LABEL
+	b	$MBB0_5
+$MBB0_5:
+	.seh_handlerdata
+	.long	"$cppxdata$?g@@YAHXZ"@imgrel
+	.text
+	.seh_endproc
+	.def	"?catch$6@?0??g@@YAHXZ@4HA";
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	1
+"?catch$6@?0??g@@YAHXZ@4HA":
+.seh_proc "?catch$6@?0??g@@YAHXZ@4HA"
+	.seh_handler __CxxFrameHandler3, %unwind, %except
+$MBB0_6:
+	push.w	{r6, r7, r11, lr}
+	.seh_save_regs_w	{r6-r7, r11, lr}
+	add.w	r11, sp, #8
+	.seh_nop_w
+	sub	sp, #24
+	.seh_stackalloc	24
+	.seh_endprologue
+	ldr	r0, [r6, #12]
+	ldr	r0, [r0]
+	str	r0, [r6, #20]
+	movw	r0, :lower16:$MBB0_3
+	movt	r0, :upper16:$MBB0_3
+	.seh_startepilogue
+	add	sp, #24
+	.seh_stackalloc	24
+	pop.w	{r6, r7, r11, lr}
+	.seh_save_regs_w	{r6-r7, r11, lr}
+	bx	lr
+	.seh_nop
+	.seh_endepilogue
+$Mfunc_end0:
+	.seh_handlerdata
+	.long	"$cppxdata$?g@@YAHXZ"@imgrel
+	.text
+	.seh_endproc
+	.section	.xdata,"dr"
+	.p2align	2, 0x0
+"$cppxdata$?g@@YAHXZ":
+	.long	429065506                       @ MagicNumber
+	.long	4                               @ MaxState
+	.long	"$stateUnwindMap$?g@@YAHXZ"@imgrel @ UnwindMap
+	.long	2                               @ NumTryBlocks
+	.long	"$tryMap$?g@@YAHXZ"@imgrel      @ TryBlockMap
+	.long	5                               @ IPMapEntries
+	.long	"$ip2state$?g@@YAHXZ"@imgrel    @ IPToStateXData
+	.long	-40                             @ UnwindHelp
+	.long	0                               @ ESTypeList
+	.long	1                               @ EHFlags
+"$stateUnwindMap$?g@@YAHXZ":
+	.long	-1                              @ ToState
+	.long	0                               @ Action
+	.long	0                               @ ToState
+	.long	0                               @ Action
+	.long	0                               @ ToState
+	.long	0                               @ Action
+	.long	-1                              @ ToState
+	.long	0                               @ Action
+"$tryMap$?g@@YAHXZ":
+	.long	1                               @ TryLow
+	.long	1                               @ TryHigh
+	.long	2                               @ CatchHigh
+	.long	1                               @ NumCatches
+	.long	"$handlerMap$0$?g@@YAHXZ"@imgrel @ HandlerArray
+	.long	0                               @ TryLow
+	.long	2                               @ TryHigh
+	.long	3                               @ CatchHigh
+	.long	1                               @ NumCatches
+	.long	"$handlerMap$1$?g@@YAHXZ"@imgrel @ HandlerArray
+"$handlerMap$0$?g@@YAHXZ":
+	.long	8                               @ Adjectives
+	.long	"??_R0?AUE@@@8"@imgrel          @ Type
+	.long	-24                             @ CatchObjOffset
+	.long	"?catch$4@?0??g@@YAHXZ@4HA"@imgrel @ Handler
+"$handlerMap$1$?g@@YAHXZ":
+	.long	8                               @ Adjectives
+	.long	"??_R0?AUE@@@8"@imgrel          @ Type
+	.long	-28                             @ CatchObjOffset
+	.long	"?catch$6@?0??g@@YAHXZ@4HA"@imgrel @ Handler
+"$ip2state$?g@@YAHXZ":
+	.long	$Mfunc_begin0@imgrel            @ IP
+	.long	-1                              @ ToState
+	.long	$Mtmp0@imgrel                   @ IP
+	.long	1                               @ ToState
+	.long	$Mtmp1@imgrel                   @ IP
+	.long	-1                              @ ToState
+	.long	"?catch$4@?0??g@@YAHXZ@4HA"@imgrel @ IP
+	.long	2                               @ ToState
+	.long	"?catch$6@?0??g@@YAHXZ@4HA"@imgrel @ IP
+	.long	3                               @ ToState
+	.text
+                                        @ -- End function
+	.section	.data,"dw",discard,"??_R0?AUE@@@8"
+	.globl	"??_R0?AUE@@@8"                 @ @"??_R0?AUE@@@8"
+	.p2align	2, 0x0
+"??_R0?AUE@@@8":
+	.long	"??_7type_info@@6B@"
+	.long	0
+	.asciz	".?AUE@@"
+
+	.section	.drectve,"yni"
+	.ascii	" /DEFAULTLIB:libcmt.lib"
+	.ascii	" /DEFAULTLIB:oldnames.lib"
+	.section	.debug$S,"dr"
+	.p2align	2, 0x0
+	.long	4                               @ Debug section magic
+	.long	241
+	.long	$Mtmp5-$Mtmp4                   @ Subsection size
+$Mtmp4:
+	.short	$Mtmp7-$Mtmp6                   @ Record length
+$Mtmp6:
+	.short	4353                            @ Record kind: S_OBJNAME
+	.long	0                               @ Signature
+	.byte	0                               @ Object name
+	.p2align	2, 0x0
+$Mtmp7:
+	.short	$Mtmp9-$Mtmp8                   @ Record length
+$Mtmp8:
+	.short	4412                            @ Record kind: S_COMPILE3
+	.long	16385                           @ Flags and language
+	.short	244                             @ CPUType
+	.short	23                              @ Frontend version
+	.short	1
+	.short	1
+	.short	0
+	.short	23011                           @ Backend version
+	.short	0
+	.short	0
+	.short	0
+	.asciz	"Varan clang version 23.1.1-rt2.4 (f4d1c31170af3fd72e09fdc3e675971a008abba5)" @ Null-terminated compiler version string
+	.p2align	2, 0x0
+$Mtmp9:
+$Mtmp5:
+	.p2align	2, 0x0
+	.addrsig
+	.addrsig_sym "?f@@YAXXZ"
+	.addrsig_sym __CxxFrameHandler3
+	.addrsig_sym _CxxThrowException
+	.addrsig_sym "??_7type_info@@6B@"
+	.addrsig_sym "??_R0?AUE@@@8"

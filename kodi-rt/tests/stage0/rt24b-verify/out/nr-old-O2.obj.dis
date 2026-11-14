@@ -1,0 +1,19 @@
+
+Disassembly of section .text:
+
+00000000 <?f@@YAHH@Z>:
+       0: e92d 4800    	push.w	{r11, lr}
+       4: 2808         	cmp	r0, #0x8
+       6: da03         	bge	0x10 <?f@@YAHH@Z+0x10>  @ imm = #0x6
+       8: eb00 0040    	add.w	r0, r0, r0, lsl #1
+       c: e8bd 8800    	pop.w	{r11, pc}
+      10: f000 f800    	bl	0x14 <?f@@YAHH@Z+0x14>  @ imm = #0x0
+			00000010:  IMAGE_REL_ARM_BRANCH24T	?die@@YAXH@Z
+
+Disassembly of section .text:
+
+00000000 <?g@@YAXH@Z>:
+       0: e92d 4800    	push.w	{r11, lr}
+       4: 3001         	adds	r0, #0x1
+       6: f000 f800    	bl	0xa <?g@@YAXH@Z+0xa>    @ imm = #0x0
+			00000006:  IMAGE_REL_ARM_BRANCH24T	?die@@YAXH@Z

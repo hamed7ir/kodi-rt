@@ -1,0 +1,4 @@
+system\python\Lib
+system\python\DLLs
+system\python\Lib\site-packages
+import site

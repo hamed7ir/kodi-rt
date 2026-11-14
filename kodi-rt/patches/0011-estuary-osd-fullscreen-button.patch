@@ -1,0 +1,18 @@
+diff --git a/addons/skin.estuary/xml/VideoOSD.xml b/addons/skin.estuary/xml/VideoOSD.xml
+index 383c8e3..f852be0 100644
+--- a/addons/skin.estuary/xml/VideoOSD.xml
++++ b/addons/skin.estuary/xml/VideoOSD.xml
+@@ -218,6 +218,13 @@
+ 						<onclick>SetProperty(settingsdialog_header,$LOCALIZE[5],home)</onclick>
+ 						<onclick>ActivateWindow(1101)</onclick>
+ 					</control>
++					<control type="radiobutton" id="70049">
++						<description>kodi-rt: switch between fullscreen and a window</description>
++						<include content="OSDButton">
++							<param name="texture" value="icons/now-playing/fullscreen.png"/>
++						</include>
++						<onclick>Action(ToggleFullScreen)</onclick>
++					</control>
+ 				</control>
+ 			</control>
+ 			<control type="group" id="6000">

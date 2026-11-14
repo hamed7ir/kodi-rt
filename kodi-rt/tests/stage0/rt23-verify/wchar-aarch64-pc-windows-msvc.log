@@ -1,0 +1,2 @@
+error: unable to create target: 'No available targets are compatible with triple "aarch64-pc-windows-msvc19.33.0"'
+1 error generated.

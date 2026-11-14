@@ -1,0 +1,14 @@
+diff --git a/cmake/modules/FindFFMPEG.cmake b/cmake/modules/FindFFMPEG.cmake
+index 2ef6a53..f89e3c3 100644
+--- a/cmake/modules/FindFFMPEG.cmake
++++ b/cmake/modules/FindFFMPEG.cmake
+@@ -563,7 +563,8 @@ if(FFMPEG_FOUND)
+   endforeach()
+ 
+   # Always enable build job for windows. Msys scripts handle rebuild requirements
+-  if((WIN32 OR WINDOWS_STORE) AND NOT TARGET ${${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_BUILD_NAME})
++  # kodi-rt: except for an external FFmpeg (-DWITH_FFMPEG/-DFFMPEG_PATH), which that job would replace
++  if((WIN32 OR WINDOWS_STORE) AND NOT FFMPEG_PATH AND NOT TARGET ${${${CMAKE_FIND_PACKAGE_NAME}_MODULE}_BUILD_NAME})
+     buildFFMPEG()
+   endif()
+ 

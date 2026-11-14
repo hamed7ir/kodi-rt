@@ -1,0 +1,54 @@
+
+Disassembly of section .text:
+
+00000000 <?g@@YAHH@Z>:
+       0: e92d 48c0    	push.w	{r6, r7, r11, lr}
+       4: f10d 0b08    	add.w	r11, sp, #0x8
+       8: b086         	sub	sp, #0x18
+       a: 466e         	mov	r6, sp
+       c: f06f 0c01    	mvn	r12, #0x1
+      10: f8c6 c000    	str.w	r12, [r6]
+      14: f8c6 c004    	str.w	r12, [r6, #0x4]
+      18: 6130         	str	r0, [r6, #0x10]
+      1a: 6930         	ldr	r0, [r6, #0x10]
+      1c: f000 f800    	bl	0x20 <?g@@YAHH@Z+0x20>  @ imm = #0x0
+			0000001c:  IMAGE_REL_ARM_BRANCH24T	?f@@YAXH@Z
+      20: e7ff         	b	0x22 <?g@@YAHH@Z+0x22>  @ imm = #-0x2
+      22: 2000         	movs	r0, #0x0
+      24: 6170         	str	r0, [r6, #0x14]
+      26: e001         	b	0x2c <$ehgcr_0_3+0x2>   @ imm = #0x2
+
+00000028 <$ehgcr_0_2>:
+      28: e000         	b	0x2c <$ehgcr_0_3+0x2>   @ imm = #0x0
+
+0000002a <$ehgcr_0_3>:
+      2a: e7ff         	b	0x2c <$ehgcr_0_3+0x2>   @ imm = #-0x2
+      2c: 6970         	ldr	r0, [r6, #0x14]
+      2e: b006         	add	sp, #0x18
+      30: e8bd 88c0    	pop.w	{r6, r7, r11, pc}
+
+00000034 <?catch$5@?0??g@@YAHH@Z@4HA>:
+      34: e92d 48c0    	push.w	{r6, r7, r11, lr}
+      38: f10d 0b08    	add.w	r11, sp, #0x8
+      3c: b086         	sub	sp, #0x18
+      3e: 2001         	movs	r0, #0x1
+      40: 6170         	str	r0, [r6, #0x14]
+      42: f240 002a    	movw	r0, #0x2a
+			00000042:  IMAGE_REL_ARM_MOV32T	.text
+      46: f2c0 0000    	movt	r0, #0x0
+      4a: b006         	add	sp, #0x18
+      4c: e8bd 48c0    	pop.w	{r6, r7, r11, lr}
+      50: 4770         	bx	lr
+
+00000052 <?catch$6@?0??g@@YAHH@Z@4HA>:
+      52: e92d 48c0    	push.w	{r6, r7, r11, lr}
+      56: f10d 0b08    	add.w	r11, sp, #0x8
+      5a: b086         	sub	sp, #0x18
+      5c: 7bf0         	ldrb	r0, [r6, #0xf]
+      5e: 6170         	str	r0, [r6, #0x14]
+      60: f240 0028    	movw	r0, #0x28
+			00000060:  IMAGE_REL_ARM_MOV32T	.text
+      64: f2c0 0000    	movt	r0, #0x0
+      68: b006         	add	sp, #0x18
+      6a: e8bd 48c0    	pop.w	{r6, r7, r11, lr}
+      6e: 4770         	bx	lr

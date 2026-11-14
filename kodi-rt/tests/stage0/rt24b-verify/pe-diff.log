@@ -1,0 +1,38 @@
+=== arm32-rel
+sizes 303104 / 303104; sections a: [('.text', '0x400', 193536), ('.rdata', '0x2f800', 77824), ('.data', '0x42800', 9728), ('.pdata', '0x44e00', 11264), ('.tls', '0x47a00', 512), ('.reloc', '0x47c00', 9216)]
+                 sections b: [('.text', '0x400', 193536), ('.rdata', '0x2f800', 77824), ('.data', '0x42800', 9728), ('.pdata', '0x44e00', 11264), ('.tls', '0x47a00', 512), ('.reloc', '0x47c00', 9216)]
+51 differing bytes in 5 ranges
+  0x80-0x81 (2 B) PE header: TimeDateStamp
+     a:  in DOS mode.$..PE.........j......................
+     b:  in DOS mode.$..PE.........j......................
+  0x37710-0x37737 (40 B) .rdata+0x7f10 (rva 0x38f10)
+     a: %d).clang 23.1.1-rt2.4 (f4d1c31170af3fd72e09fdc3e675971a008abba5).([a-z]+)-([0-9]+)\.([0
+     b: %d).clang 23.1.1-rt2.4 (0549949d0942cc3c8eed3927dde694cef24b232c).([a-z]+)-([0-9]+)\.([0
+  0x3baf4-0x3baf5 (2 B) .rdata+0xc2f4 (rva 0x3d2f4)
+     a: n.-.l.1.-.1.-.0............j........N...........RS
+     b: n.-.l.1.-.1.-.0............j........N...........RS
+  0x3bb10-0x3bb17 (8 B) .rdata+0xc310 (rva 0x3d310)
+     a: ........N...........RSDS..XO.B..LLD PDB.....F:\kodi-rt\b
+     b: ........N...........RSDS.......fLLD PDB.....F:\kodi-rt\b
+  0x3bb3c-0x3bb3c (1 B) .rdata+0xc33c (rva 0x3d33c)
+     a: F:\kodi-rt\build\s0-rt24t\ehtest\arm32-rel\ehtest
+     b: F:\kodi-rt\build\s0-rt24b\ehtest\arm32-rel\ehtest
+=== arm32-od
+sizes 375296 / 375296; sections a: [('.text', '0x400', 242176), ('.rdata', '0x3b600', 92672), ('.data', '0x52000', 9728), ('.pdata', '0x54600', 19456), ('.tls', '0x59200', 512), ('.reloc', '0x59400', 9728)]
+                 sections b: [('.text', '0x400', 242176), ('.rdata', '0x3b600', 92672), ('.data', '0x52000', 9728), ('.pdata', '0x54600', 19456), ('.tls', '0x59200', 512), ('.reloc', '0x59400', 9728)]
+51 differing bytes in 5 ranges
+  0x80-0x81 (2 B) PE header: TimeDateStamp
+     a:  in DOS mode.$..PE.........j......................
+     b:  in DOS mode.$..PE.........j......................
+  0x43705-0x4372c (40 B) .rdata+0x8105 (rva 0x45105)
+     a: %d).clang 23.1.1-rt2.4 (f4d1c31170af3fd72e09fdc3e675971a008abba5).([a-z]+)-([0-9]+)\.([0
+     b: %d).clang 23.1.1-rt2.4 (0549949d0942cc3c8eed3927dde694cef24b232c).([a-z]+)-([0-9]+)\.([0
+  0x47adc-0x47add (2 B) .rdata+0xc4dc (rva 0x494dc)
+     a: n.-.l.1.-.1.-.0............j........M........z..RS
+     b: n.-.l.1.-.1.-.0............j........M........z..RS
+  0x47af8-0x47aff (8 B) .rdata+0xc4f8 (rva 0x494f8)
+     a: ........M........z..RSDS.......ZLLD PDB.....F:\kodi-rt\b
+     b: ........M........z..RSDS.H.6.E..LLD PDB.....F:\kodi-rt\b
+  0x47b24-0x47b24 (1 B) .rdata+0xc524 (rva 0x49524)
+     a: F:\kodi-rt\build\s0-rt24t\ehtest\arm32-od\ehtest.
+     b: F:\kodi-rt\build\s0-rt24b\ehtest\arm32-od\ehtest.

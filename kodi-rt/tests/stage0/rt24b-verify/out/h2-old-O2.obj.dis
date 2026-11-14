@@ -1,0 +1,44 @@
+
+Disassembly of section .text:
+
+00000000 <?g@@YAHH@Z>:
+       0: b540         	push	{r6, lr}
+       2: b084         	sub	sp, #0x10
+       4: 466e         	mov	r6, sp
+       6: f06f 0c01    	mvn	r12, #0x1
+       a: f8c6 c000    	str.w	r12, [r6]
+       e: f8c6 c004    	str.w	r12, [r6, #0x4]
+      12: f000 f800    	bl	0x16 <?g@@YAHH@Z+0x16>  @ imm = #0x0
+			00000012:  IMAGE_REL_ARM_BRANCH24T	?f@@YAXH@Z
+      16: 2000         	movs	r0, #0x0
+      18: 60b0         	str	r0, [r6, #0x8]
+      1a: e7ff         	b	0x1c <$ehgcr_0_2>       @ imm = #-0x2
+
+0000001c <$ehgcr_0_2>:
+      1c: 68b0         	ldr	r0, [r6, #0x8]
+      1e: b004         	add	sp, #0x10
+      20: bd40         	pop	{r6, pc}
+
+00000022 <?catch$3@?0??g@@YAHH@Z@4HA>:
+      22: b540         	push	{r6, lr}
+      24: b084         	sub	sp, #0x10
+      26: 2001         	movs	r0, #0x1
+      28: 60b0         	str	r0, [r6, #0x8]
+      2a: f240 001c    	movw	r0, #0x1c
+			0000002a:  IMAGE_REL_ARM_MOV32T	.text
+      2e: f2c0 0000    	movt	r0, #0x0
+      32: b004         	add	sp, #0x10
+      34: e8bd 4040    	pop.w	{r6, lr}
+      38: 4770         	bx	lr
+
+0000003a <?catch$4@?0??g@@YAHH@Z@4HA>:
+      3a: b540         	push	{r6, lr}
+      3c: b084         	sub	sp, #0x10
+      3e: 7bf0         	ldrb	r0, [r6, #0xf]
+      40: 60b0         	str	r0, [r6, #0x8]
+      42: f240 001c    	movw	r0, #0x1c
+			00000042:  IMAGE_REL_ARM_MOV32T	.text
+      46: f2c0 0000    	movt	r0, #0x0
+      4a: b004         	add	sp, #0x10
+      4c: e8bd 4040    	pop.w	{r6, lr}
+      50: 4770         	bx	lr

@@ -1,0 +1,73 @@
+
+Disassembly of section .text:
+
+00000000 <?after_catchret@@YAHH@Z>:
+       0: e92d 48c0    	push.w	{r6, r7, r11, lr}
+       4: f10d 0b08    	add.w	r11, sp, #0x8
+       8: b088         	sub	sp, #0x20
+       a: 466e         	mov	r6, sp
+       c: f06f 0c01    	mvn	r12, #0x1
+      10: f8c6 c000    	str.w	r12, [r6]
+      14: f8c6 c004    	str.w	r12, [r6, #0x4]
+      18: 61f0         	str	r0, [r6, #0x1c]
+      1a: 2000         	movs	r0, #0x0
+      1c: 61b0         	str	r0, [r6, #0x18]
+      1e: 69f0         	ldr	r0, [r6, #0x1c]
+      20: 6170         	str	r0, [r6, #0x14]
+      22: f240 0100    	movw	r1, #0x0
+			00000022:  IMAGE_REL_ARM_MOV32T	_TI1H
+      26: f2c0 0100    	movt	r1, #0x0
+      2a: f106 0014    	add.w	r0, r6, #0x14
+      2e: f000 f800    	bl	0x32 <?after_catchret@@YAHH@Z+0x32> @ imm = #0x0
+			0000002e:  IMAGE_REL_ARM_BRANCH24T	_CxxThrowException
+      32: e013         	b	0x5c <$ehgcr_0_3+0x8>   @ imm = #0x26
+
+00000034 <$ehgcr_0_1>:
+      34: 69b0         	ldr	r0, [r6, #0x18]
+      36: f000 f800    	bl	0x3a <$ehgcr_0_1+0x6>   @ imm = #0x0
+			00000036:  IMAGE_REL_ARM_BRANCH24T	?side@@YAXH@Z
+      3a: e7ff         	b	0x3c <$ehgcr_0_1+0x8>   @ imm = #-0x2
+      3c: 69b0         	ldr	r0, [r6, #0x18]
+      3e: 3001         	adds	r0, #0x1
+      40: 60f0         	str	r0, [r6, #0xc]
+      42: f240 0100    	movw	r1, #0x0
+			00000042:  IMAGE_REL_ARM_MOV32T	_TI1H
+      46: f2c0 0100    	movt	r1, #0x0
+      4a: f106 000c    	add.w	r0, r6, #0xc
+      4e: f000 f800    	bl	0x52 <$ehgcr_0_1+0x1e>  @ imm = #0x0
+			0000004e:  IMAGE_REL_ARM_BRANCH24T	_CxxThrowException
+      52: e003         	b	0x5c <$ehgcr_0_3+0x8>   @ imm = #0x6
+
+00000054 <$ehgcr_0_3>:
+      54: 69b0         	ldr	r0, [r6, #0x18]
+      56: b008         	add	sp, #0x20
+      58: e8bd 88c0    	pop.w	{r6, r7, r11, pc}
+      5c: defe         	trap
+
+0000005e <?catch$5@?0??after_catchret@@YAHH@Z@4HA>:
+      5e: e92d 48c0    	push.w	{r6, r7, r11, lr}
+      62: f10d 0b08    	add.w	r11, sp, #0x8
+      66: b088         	sub	sp, #0x20
+      68: 6930         	ldr	r0, [r6, #0x10]
+      6a: 61b0         	str	r0, [r6, #0x18]
+      6c: f240 0034    	movw	r0, #0x34
+			0000006c:  IMAGE_REL_ARM_MOV32T	.text
+      70: f2c0 0000    	movt	r0, #0x0
+      74: b008         	add	sp, #0x20
+      76: e8bd 48c0    	pop.w	{r6, r7, r11, lr}
+      7a: 4770         	bx	lr
+
+0000007c <?catch$6@?0??after_catchret@@YAHH@Z@4HA>:
+      7c: e92d 48c0    	push.w	{r6, r7, r11, lr}
+      80: f10d 0b08    	add.w	r11, sp, #0x8
+      84: b088         	sub	sp, #0x20
+      86: 68b0         	ldr	r0, [r6, #0x8]
+      88: eb00 0080    	add.w	r0, r0, r0, lsl #2
+      8c: 0040         	lsls	r0, r0, #0x1
+      8e: 61b0         	str	r0, [r6, #0x18]
+      90: f240 0054    	movw	r0, #0x54
+			00000090:  IMAGE_REL_ARM_MOV32T	.text
+      94: f2c0 0000    	movt	r0, #0x0
+      98: b008         	add	sp, #0x20
+      9a: e8bd 48c0    	pop.w	{r6, r7, r11, lr}
+      9e: 4770         	bx	lr

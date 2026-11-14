@@ -1,0 +1,7 @@
+<advancedsettings>
+  <!-- kodi-rt: skip the in-loop filters (deblocking, and SAO for HEVC) of software-decoded video, such as x265.
+       Saves CPU at the cost of some blockiness. 48 = all frames (fastest), 32 = all but key frames,
+       16 = B-frames only, 0 = off (Kodi's default). Hardware-decoded video (H.264 on the Surface) is not
+       affected. Change the number, save, and restart Kodi. -->
+  <skiploopfilter>48</skiploopfilter>
+</advancedsettings>

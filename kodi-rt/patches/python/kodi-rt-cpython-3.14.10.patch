@@ -1,0 +1,30 @@
+diff -ru --strip-trailing-cr ../../../src/deps/Python-3.14.10/Objects/mimalloc/prim/windows/prim.c Python-3.14.10/Objects/mimalloc/prim/windows/prim.c
+--- a/Python-3.14.10/Objects/mimalloc/prim/windows/prim.c	2026-10-25 10:12:00.000000000 -0700
++++ b/Python-3.14.10/Objects/mimalloc/prim/windows/prim.c	2026-11-13 09:14:49.556217300 -0800
+@@ -852,7 +852,7 @@
+ 
+   typedef int (mi_cdecl* mi_crt_callback_t)(void);
+ 
+-  #if defined(_WIN64) && defined(_MSC_VER) // 64-bit
++  #if (defined(_WIN64) || defined(_M_ARM)) && defined(_MSC_VER) // 64-bit; ARM32 has no leading underscore either
+     #pragma comment(linker, "/INCLUDE:_tls_used")
+     #pragma comment(linker, "/INCLUDE:_mi_tls_callback_pre")
+     #pragma comment(linker, "/INCLUDE:_mi_tls_callback_post")
+@@ -958,7 +958,7 @@
+   extern "C" {
+   #endif
+ 
+-  #if defined(_WIN64) && defined(_MSC_VER) // 64-bit
++  #if (defined(_WIN64) || defined(_M_ARM)) && defined(_MSC_VER) // 64-bit; ARM32 has no leading underscore either
+     #pragma comment(linker, "/INCLUDE:_tls_used")
+     #pragma comment(linker, "/INCLUDE:_mi_tls_callback_pre")
+     #pragma comment(linker, "/INCLUDE:_mi_tls_callback_post")
+@@ -1032,7 +1032,7 @@
+   extern "C" {
+   #endif
+ 
+-  #if defined(_WIN64) && defined(_MSC_VER) // 64-bit
++  #if (defined(_WIN64) || defined(_M_ARM)) && defined(_MSC_VER) // 64-bit; ARM32 has no leading underscore either
+     #pragma comment(linker, "/INCLUDE:_tls_used")
+     #pragma comment(linker, "/INCLUDE:_mi_tls_callback_pre")
+     #pragma comment(linker, "/INCLUDE:_mi_tls_callback_post")
