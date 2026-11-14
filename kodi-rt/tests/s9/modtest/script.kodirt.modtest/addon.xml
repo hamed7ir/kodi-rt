@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.kodirt.modtest" name="kodi-rt module test" version="1.0.0" provider-name="kodi-rt">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.pycryptodome" version="3.4.3"/>
+    <import addon="script.module.pil" version="5.1.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="default.py"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">kodi-rt: checks ctypes, pycryptodome and Pillow inside Kodi's Python</summary>
+    <description lang="en_GB">Runs a few checks of ctypes, Cryptodome (pycryptodome) and PIL (Pillow) the way an add-on uses them (as dependencies) and writes the results to modtest-result.json in Kodi's data folder and to kodi.log.</description>
+    <platform>all</platform>
+  </extension>
+</addon>

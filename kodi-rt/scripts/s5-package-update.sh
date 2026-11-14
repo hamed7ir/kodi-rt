@@ -5,7 +5,9 @@
 #   BASEKIT=<kit folder>: also every file of the build tree's addons/media/system/userdata that differs from that kit's
 #   kodi\ folder (new or changed), so the update brings everything the base kit lacks.
 #   PYTHON=1: also python314.dll next to kodi.exe and the standard library as kodi\system\python\Lib (without tests,
-#   IDLE, tkinter, turtledemo, ensurepip) from prefix/arm32/python, plus empty DLLs\ and Lib\site-packages\.
+#   IDLE, tkinter, turtledemo, ensurepip) from prefix/arm32/python, plus empty DLLs\ and Lib\site-packages\, and
+#   addons\script.module.pycryptodome and script.module.pil from prefix/arm32/kodi-addons when built
+#   (scripts/pycd-build.sh, scripts/pil-build.sh).
 # Usage (Git Bash):
 #   UNAME=kodi-rt-stage5-run5-update ZNAME=kodi-rt-stage5-run5-update-20261113 \
 #   GATED=/f/kodi-rt/results/stage5-kit5/bin [BASEKIT=/f/kodi-rt/kit/kodi-rt-stage5-run4] [PYTHON=1] \
@@ -49,6 +51,19 @@ if [ -n "$PYTHON" ]; then
   mkdir -p "$OUT/kodi/system/python/Lib/site-packages"
   [ -f "$OUT/kodi/python314._pth" ] || { echo "kit/$UNAME/kodi/python314._pth missing"; exit 1; }
   echo "python: $(find "$OUT/kodi/system/python" -type f | wc -l) files, $(du -sh "$OUT/kodi/system/python" | cut -f1)"
+  # Kodi's script.module.pycryptodome with the Cryptodome package and its ARM32 C modules (scripts/pycd-build.sh)
+  PYCD=/f/kodi-rt/prefix/arm32/kodi-addons/script.module.pycryptodome
+  if [ -d "$PYCD/lib/Cryptodome" ]; then
+    mkdir -p "$OUT/kodi/addons" && rm -rf "$OUT/kodi/addons/script.module.pycryptodome" && cp -r "$PYCD" "$OUT/kodi/addons/" || exit 1
+    find "$OUT/kodi/addons/script.module.pycryptodome" -name __pycache__ -prune -exec rm -rf {} +
+    echo "pycryptodome add-on: $(find "$OUT/kodi/addons/script.module.pycryptodome" -name '*.pyd' | wc -l) C modules"
+  fi
+  PIL=/f/kodi-rt/prefix/arm32/kodi-addons/script.module.pil
+  if [ -f "$PIL/lib/PIL/_imaging.pyd" ]; then
+    mkdir -p "$OUT/kodi/addons" && rm -rf "$OUT/kodi/addons/script.module.pil" && cp -r "$PIL" "$OUT/kodi/addons/" || exit 1
+    find "$OUT/kodi/addons/script.module.pil" -name __pycache__ -prune -exec rm -rf {} +
+    echo "Pillow add-on: $(find "$OUT/kodi/addons/script.module.pil" -name '*.pyd' | wc -l) C modules"
+  fi
 fi
 ( cd "$OUT" && find . -type f | sed 's|^\./||' | sort | while read -r f; do printf '%s  %s\n' "$(sha256sum "$f" | cut -d' ' -f1)" "$f"; done ) > "$OUT/MANIFEST-$UNAME.txt"
 python -I -c "import sys; p=sys.argv[1]; d=open(p,'rb').read().replace(b'\r\n',b'\n').replace(b'\n',b'\r\n'); open(p,'wb').write(d)" "$(cygpath -m "$OUT/MANIFEST-$UNAME.txt")"

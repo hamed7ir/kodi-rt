@@ -43,7 +43,9 @@ build, and Team Kodi has nothing to do with it.
 | file | project | license |
 |---|---|---|
 | `dvdnav.dll` | libdvdnav 7.0.0 + libdvdread 7.0.1 | GPL-2.0-or-later |
-| `python314.dll`, `system\python` | CPython 3.14.10, with its bundled mimalloc, expat, sqlite3, zlib, liblzma (xz 5.8.3), bzip2 1.0.8 and OpenSSL modules | PSF-2.0 (bundled parts: MIT, public domain, zlib, 0BSD, bzip2, Apache-2.0) |
+| `python314.dll`, `system\python` | CPython 3.14.10, with its bundled mimalloc, expat, sqlite3, zlib, liblzma (xz 5.8.3), bzip2 1.0.8 and OpenSSL modules, and libffi 3.5.2 for ctypes | PSF-2.0 (bundled parts: MIT, public domain, zlib, 0BSD, bzip2, Apache-2.0; libffi: MIT) |
+| `addons\script.module.pycryptodome` | pycryptodome 3.23.0 (its C modules built per architecture) | BSD-2-Clause and public domain (`LICENSE.rst` in the add-on) |
+| `addons\script.module.pil` | Pillow 12.0.0, its C modules with libjpeg-turbo 3.1.4.1, zlib 1.3.2, FreeType 2.14.2, HarfBuzz 14.2.0, FriBidi 1.0.17 and raqm statically linked | MIT-CMU (Pillow); IJG + BSD-3-Clause, zlib, FTL, MIT, LGPL-2.1-or-later, MIT (`LICENSE` and `NOTICE.txt` in the add-on) |
 | `Kodi-RT-Setup-*.exe` | Venetium's installer (hamed7ir/venetium, from hamed7ir/DroidFinestra) | GPLv3 |
 
 the build also uses host tools that are not shipped: kodi's prebuilt TexturePacker, pkgconf 2.5.1, swig 4.5.0, and

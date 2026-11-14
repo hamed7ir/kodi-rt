@@ -1,0 +1,71 @@
+diff --git a/addons/skin.estuary/media/osd/fullscreen/buttons/fullscreen.png b/addons/skin.estuary/media/osd/fullscreen/buttons/fullscreen.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..5dbf5e61ae05e4a02e78989db31039b4322b9015
+GIT binary patch
+literal 689
+zcmeAS@N?(olHy`uVBq!ia0vp^4Is?H1|$#LC7uRSjKx9jP7LeL$-D$|SkfJR9T^xl
+z_H+M9WCij$3p^r=85sBugD~Uq{1qt-3`}mGE{-7;ac}QF^py@2Xbqe`DM+JN=#rzC
+z7pG<;-<vZp-tKp~vHSNQo8-C5YkLwIGxuw^@XX)_8ixX=l<&T4_vlAVO-;`HdEvL4
+z)_mJpTNS69+@t0#=^!eZY!Z2jVbuwV#V3Q<0$h(t_)arw&@wufv1tlp$V5Z8$xC?_
+zboCg{(n)0qb?I^DXNg^Z{eEHf6vh&<kM+5V{YDMz)Q<SGUAVa9$4Q1=GbQXL9n>d3
+zR%d>Zl>f)#e|GgpYqkpq8-LV4`myuw-#*5Wa+SI}e>#-q)ps0c(6W}Yzi*z$yI`~N
+z$KX9V46$>2=RexVSYo1F*L7Xe!F=<h<rRAwON@-`y0%L?h;M$pyka+F$%mdFn&%7~
+zUd<D=KU&EaaMSqla*OK>tE$TWh&-2eaMcECn(tnB{DOS@x-D9Etex>OF>jXFo)p>N
+zxZ{E3k9l|Rn{?iHiTU!9Sz!Of9Up?(73z!&KQ8BW_|v9zU<zZ${SX%mTZWI)-2%(m
+z6zYlvAAevtQqL^-<N}Zq7EJvPq?85It^+A!!RHSdJN~yRU2tX=`0wkwWH)oijNS7l
+zc>Zxyx}qG<D5q9uESP<Z;YhwlldojM4`0_Umw}dU<S5T#cw{dAk&j>DQT@@0=TA<S
+zPd@+f`li)4fN^tQUhg9lDUp)Wb1_Aed4*EakLPDm;vLBOu>SN@eR;pAtGj<0w1Ff&
+MUHx3vIVCg!05%F2LI3~&
+
+literal 0
+HcmV?d00001
+
+diff --git a/addons/skin.estuary/media/osd/fullscreen/buttons/windowed.png b/addons/skin.estuary/media/osd/fullscreen/buttons/windowed.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..1a6b39447b1b18248af99994fa797806e8b6ea70
+GIT binary patch
+literal 740
+zcmeAS@N?(olHy`uVBq!ia0vp^4Is?H1|$#LC7uRSjKx9jP7LeL$-D$|SkfJR9T^xl
+z_H+M9WCij$3p^r=85sBugD~Uq{1qt-3`~`tE{-7;ac}S5^_6xMX-kZMW~3UxwKUMl
+zYC+GGi9#BUd~fC)UbB=%vie*4ku&c;dno58Jbd<7<fIy(I?zlc@PK>z>8Hm_PF|dI
+z{`qx_{k;zwjOtqcC$O-8&i|vWY|#<@aeYt1^LI!08#VR0bUe4v=Rfzk<aewoP<Vl`
+zpdz#VC!@RnmRf!czVly<-~aOT&#_8}UNLsqZ{XON#qfw<FG)wP;fJ+=qZqHlpSc|x
+zo7olq^|{Q5WEQATSMvMHaOD0%ju2CZkL6lQwlWS!{usxG3DzqJu6mZ=koAaPEh*QG
+z;Ul}qK{LsQAI)7EtAV-?DBW2FG=E3O_6i2U|F-AW?>O_m@O{YNYNmY$MOJK`ZSS*)
+zS#r5a)+vUnsfAvPm+>qJCyFatm~~HL)3*vm4hDt=CzgB6pJ%kyVqV+VEUqiF#FI!f
+z3udw4@>i`3KA+j1QJ=)1-2G$ozv4D&o`ewTBmQg#i+UfaGfSLp`#71gC*|>vlMHT#
+z=5=@e+r{2XW>Ah0_^<1?&;Gw4^NYKaeti5Oq8_haafG32n@L?=u8q`z6W5OT7v?f7
+zj*_-NI-fVeCHjc}M?;`#VIPBQ?l8D*O8p};-?$+#N7nx6bKV3N!H4NAYyZux^Zg_8
+zJ?C4ue5Q_5NbdqOJLawp<?agq7+oIBRu=g0p!B64NHr+^IL>jzeuGTo52SPgWENb0
+Z`9)k#_@&tr(F?agQl74UF6*2UngIBaFMI$1
+
+literal 0
+HcmV?d00001
+
+diff --git a/addons/skin.estuary/xml/VideoOSD.xml b/addons/skin.estuary/xml/VideoOSD.xml
+index f852be0..8968beb 100644
+--- a/addons/skin.estuary/xml/VideoOSD.xml
++++ b/addons/skin.estuary/xml/VideoOSD.xml
+@@ -219,11 +219,20 @@
+ 						<onclick>ActivateWindow(1101)</onclick>
+ 					</control>
+ 					<control type="radiobutton" id="70049">
+-						<description>kodi-rt: switch between fullscreen and a window</description>
++						<description>kodi-rt: from fullscreen to a window</description>
+ 						<include content="OSDButton">
+-							<param name="texture" value="icons/now-playing/fullscreen.png"/>
++							<param name="texture" value="osd/fullscreen/buttons/windowed.png"/>
+ 						</include>
+ 						<onclick>Action(ToggleFullScreen)</onclick>
++						<visible>System.IsFullscreen</visible>
++					</control>
++					<control type="radiobutton" id="70050">
++						<description>kodi-rt: from a window to fullscreen</description>
++						<include content="OSDButton">
++							<param name="texture" value="osd/fullscreen/buttons/fullscreen.png"/>
++						</include>
++						<onclick>Action(ToggleFullScreen)</onclick>
++						<visible>!System.IsFullscreen</visible>
+ 					</control>
+ 				</control>
+ 			</control>

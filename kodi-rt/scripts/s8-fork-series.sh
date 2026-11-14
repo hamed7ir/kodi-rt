@@ -20,16 +20,19 @@ n=0
 while IFS=$'\t' read -r file how subject body; do
   case $file in ''|'#'*) continue ;; esac
   git add -A && T0=$(git write-tree) || exit 1
-  case $how in
-    patch:*)        git apply --whitespace=nowarn "$W/patches/${how#patch:}" || { echo "FAILED: $how"; exit 1; } ;;
-    patch-unedit:*) r=${how#patch-unedit:}; p=${r%%:*}; e=${r#*:}
-                    git apply --whitespace=nowarn "$W/patches/$p" || { echo "FAILED: $how"; exit 1; }
-                    python -I "$W/scripts/s8-unapply-edits.py" "$S" "$W/reports/proposed-edits/$e" > /dev/null || { echo "FAILED: $how"; exit 1; } ;;
-    edit:*)         python -I "$W/scripts/s7-apply-edits.py" "$S" "$W/reports/proposed-edits/${how#edit:}" > /dev/null || { echo "FAILED: $how"; exit 1; } ;;
-    copy:*)         IFS=',' read -r -a pairs <<< "${how#copy:}"
-                    for pr in "${pairs[@]}"; do cp -f "$W/${pr%%=*}" "$S/${pr#*=}" || { echo "FAILED: $how"; exit 1; }; done ;;
-    *) echo "unknown: $how"; exit 1 ;;
+  IFS=';' read -r -a acts <<< "$how"   # several actions for one commit: "edit:x.py;copy:a=b"
+  for act in "${acts[@]}"; do
+  case $act in
+    patch:*)        git apply --whitespace=nowarn "$W/patches/${act#patch:}" || { echo "FAILED: $act"; exit 1; } ;;
+    patch-unedit:*) r=${act#patch-unedit:}; p=${r%%:*}; e=${r#*:}
+                    git apply --whitespace=nowarn "$W/patches/$p" || { echo "FAILED: $act"; exit 1; }
+                    python -I "$W/scripts/s8-unapply-edits.py" "$S" "$W/reports/proposed-edits/$e" > /dev/null || { echo "FAILED: $act"; exit 1; } ;;
+    edit:*)         python -I "$W/scripts/s7-apply-edits.py" "$S" "$W/reports/proposed-edits/${act#edit:}" > /dev/null || { echo "FAILED: $act"; exit 1; } ;;
+    copy:*)         IFS=',' read -r -a pairs <<< "${act#copy:}"
+                    for pr in "${pairs[@]}"; do cp -f "$W/${pr%%=*}" "$S/${pr#*=}" || { echo "FAILED: $act"; exit 1; }; done ;;
+    *) echo "unknown: $act"; exit 1 ;;
   esac
+  done
   git add -A && T1=$(git write-tree) || exit 1
   [ "$T0" != "$T1" ] || { echo "EMPTY: $file"; exit 1; }
   git diff-tree -p --binary "$T0" "$T1" > "$OUT/$file"

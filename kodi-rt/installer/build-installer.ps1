@@ -57,6 +57,14 @@ foreach ($f in 'kodi.exe', 'python314.dll', 'dvdnav.dll') {
     $m = PeMachine (Join-Path $stage $f)
     if ($m -ne $wantMachine) { throw ("{0} is machine 0x{1:X}, not 0x{2:X} ({3})" -f $f, $m, $wantMachine, $Flavor) }
 }
+# every other program in the payload too: pycryptodome's C modules (addons\script.module.pycryptodome\lib\**\*.pyd)
+# are built per architecture, and a module of the wrong flavor would only fail when an add-on loads it
+$progs = @(Get-ChildItem $stage -File -Recurse -Include *.exe, *.dll, *.pyd)
+foreach ($p in $progs) {
+    $m = PeMachine $p.FullName
+    if ($m -ne $wantMachine) { throw ("{0} is machine 0x{1:X}, not 0x{2:X} ({3})" -f $p.FullName.Substring($stage.Length + 1), $m, $wantMachine, $Flavor) }
+}
+"programs: $($progs.Count), all machine 0x{0:X}" -f $wantMachine
 if (Test-Path (Join-Path $stage 'portable_data')) { throw 'portable_data must not be in the payload' }
 $files = Get-ChildItem $stage -File -Recurse | ForEach-Object { $_.FullName.Substring($stage.Length + 1) }
 $bad = $files | Where-Object { $_ -match ',' }

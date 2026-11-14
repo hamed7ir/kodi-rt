@@ -30,7 +30,7 @@ for k in kodi-rt-stage6-pgo kodi-rt-pgo-profile; do
   mkdir -p "$R/kit/$k" && cp "$W/kit/$k"/*.cmd "$W/kit/$k/README.txt" "$R/kit/$k/" || exit 1
 done
 mkdir -p "$R/downloads" && cp "$W/downloads/sources/MANIFEST.tsv" "$R/downloads/" || exit 1
-mkdir -p "$R/branding" && cp "$W/branding/README.txt" "$R/branding/" || exit 1   # the assets themselves are in the Kodi tree (commit 0018)
+mkdir -p "$R/branding" && cp "$W/branding/README.txt" "$W/branding/poster-v1.0.png" "$R/branding/" || exit 1   # icon + splash are in the Kodi tree (commit 0018)
 find "$R" -name __pycache__ -type d -prune -exec rm -rf {} +
 
 # checks: no binaries (the icon and the xz profile are the only non-text files), nothing big, no private data
@@ -38,7 +38,7 @@ FAIL=0
 bin=$(find "$R" -type f \( -iname '*.exe' -o -iname '*.obj' -o -iname '*.o' -o -iname '*.pdb' -o -iname '*.lib' -o -iname '*.dll' \
       -o -iname '*.dmp' -o -iname '*.zip' -o -iname '*.profraw' \))
 [ -z "$bin" ] || { echo "BINARIES:"; echo "$bin"; FAIL=1; }
-big=$(find "$R" -type f -size +1M ! -name 'kodi-20261113.profdata.xz')
+big=$(find "$R" -type f -size +1M ! -name 'kodi-20261113.profdata.xz' ! -name 'poster-v1.0.png')
 [ -z "$big" ] || { echo "FILES OVER 1 MB:"; echo "$big"; FAIL=1; }
 # (LICENSE.txt: the GPL's "no special password or key"; this script: the pattern itself)
 priv=$(grep -rIl -iE 'gmail\.com|password|api[_-]?key|BEGIN (RSA|OPENSSH|PRIVATE)' "$R" | grep -vE '/(LICENSE\.txt|s8-assemble-(repo|fork)\.sh)$' || true)

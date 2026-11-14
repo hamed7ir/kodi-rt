@@ -1,4 +1,5 @@
-# kodi-rt Stage 4: the source edits behind patches/0001-0016, applied to the patch-development clone
+# kodi-rt Stage 4: the source edits behind patches/0001-0016 (the layered ones, 0017 on, are in s4-dev-edits-2.py),
+# applied to the patch-development clone
 # build/s4/kodi-dev (a local git clone of src/xbmc at bffa625c). Each replacement must match exactly once.
 # The patches themselves (git diff of the result, split by topic) are the record; this script makes them reproducible.
 # Usage: python -I scripts/s4-dev-edits.py F:/kodi-rt/build/s4/kodi-dev

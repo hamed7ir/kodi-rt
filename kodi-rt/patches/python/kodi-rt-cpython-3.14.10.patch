@@ -1,6 +1,18 @@
+diff -ru --strip-trailing-cr ../../../src/deps/Python-3.14.10/Modules/_ctypes/callbacks.c Python-3.14.10/Modules/_ctypes/callbacks.c
+--- a/Python-3.14.10/Modules/_ctypes/callbacks.c	2026-10-25 10:12:00.000000000 -0700
++++ b/Python-3.14.10/Modules/_ctypes/callbacks.c	2026-11-14 08:35:28.392049500 -0800
+@@ -639,7 +639,7 @@
+     return result;
+ }
+ 
+-#ifndef Py_NO_ENABLE_SHARED
++#if !defined(Py_NO_ENABLE_SHARED) && !defined(Py_BUILD_CORE_BUILTIN) /* kodi-rt: built in, PC/dl_nt.c has it */
+ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvRes)
+ {
+     switch(fdwReason) {
 diff -ru --strip-trailing-cr ../../../src/deps/Python-3.14.10/Objects/mimalloc/prim/windows/prim.c Python-3.14.10/Objects/mimalloc/prim/windows/prim.c
 --- a/Python-3.14.10/Objects/mimalloc/prim/windows/prim.c	2026-10-25 10:12:00.000000000 -0700
-+++ b/Python-3.14.10/Objects/mimalloc/prim/windows/prim.c	2026-11-13 09:14:49.556217300 -0800
++++ b/Python-3.14.10/Objects/mimalloc/prim/windows/prim.c	2026-11-14 08:35:28.391051100 -0800
 @@ -852,7 +852,7 @@
  
    typedef int (mi_cdecl* mi_crt_callback_t)(void);

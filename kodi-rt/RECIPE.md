@@ -52,6 +52,18 @@ cpython 3.14.10 (kodi's pin) with a cmake project of mine (`cross/cmake/python3`
 lists with clang-cl, the extension modules inside `python314.dll`: `py-prepare-src.sh`, `py-deps.sh`, `py-build.sh`.
 `py-swig.sh` builds the host swig for kodi's bindings, and `py-kodi-configure.sh` turns python on in the kodi build.
 
+the modules add-ons need, per architecture (arm32, x64, x86), all kodi's pins:
+
+- ctypes: libffi 3.5.2 as a static library (`cross/cmake/libffi`, `py-deps.sh <arch> libffi`; the assembly goes through
+  msvc's armasm/ml/ml64 like libffi's own windows build), `_ctypes` compiled into `python314.dll`
+- pycryptodome 3.23.0: `cross/cmake/pycryptodome`, `pycd-build.sh <arch>` makes kodi's
+  `script.module.pycryptodome` in `prefix/<arch>/kodi-addons`
+- pillow 12.0.0 with libjpeg-turbo 3.1.4.1 (`py-deps.sh <arch> jpeg`), zlib, freetype and raqm:
+  `cross/cmake/pillow`, `pil-build.sh <arch>` makes kodi's `script.module.pil` the same way
+
+the kit scripts put both add-ons over kodi's empty stubs. `py-check-arm32.sh` checks the arm32 binaries, and
+`tests/s9/addon-modules-test.ps1` runs a test add-on that uses ctypes, pycryptodome and pillow inside kodi (x64, x86).
+
 ## 5. pgo + thinlto (`s7-*`)
 
 1. phase 1, counting builds from frozen copies of the patched sources (`build/s7/kodi`, `build/s7/ffmpeg-src`; phase 2
@@ -68,10 +80,11 @@ lists with clang-cl, the extension modules inside `python314.dll`: `py-prepare-s
 `installer/build-installer.ps1` takes a full kit's `kodi\` folder and builds `Kodi-RT-Setup-<ver>-<flavor>.exe`
 (`-Flavor arm32`, `x64` or `x86`), venetium's msil installer adapted for kodi. it also puts kodi rt in explorer's "open
 with" for the video, music and playlist types it plays (per user). `installer/tests/test-installer.ps1` runs it end to
-end in a scratch folder.
+end in a scratch folder, and `tests/s9/upgrade-test.ps1` installs an older setup and then the new one over it.
 
 `branding/`: the purple icon (`s9-recolor-icon.py`, kodi's blue turned 85 degrees) and the splash with kodi's real
-version (`s9-splash.ps1`); they are commit 0018.
+version (`s9-splash.ps1`) are commit 0018; the video controls' fullscreen icons (`s9-osd-icons.ps1`) commit 0020; the
+purple kodi logo (`s9-recolor-png.ps1`, the same 85 degrees) commit 0021.
 
 ## 7. x64 and x86 (`s9-*`)
 

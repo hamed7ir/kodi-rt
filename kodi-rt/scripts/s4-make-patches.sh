@@ -1,7 +1,11 @@
 #!/bin/bash
-# kodi-rt Stage 4: regenerate patches/0001-0016 from scripts/s4-dev-edits.py.
+# kodi-rt Stage 4: regenerate patches/0001-0019 from scripts/s4-dev-edits.py (0001-0016) and s4-dev-edits-2.py (0017-).
 #   resets the patch-development clone build/s4/kodi-dev to the pinned commit, applies the edits, and writes one
-#   patch per topic (git diff of that topic's files). Usage (Git Bash): bash scripts/s4-make-patches.sh [outdir]
+#   patch per topic (git diff of that topic's files). 0001-0016 own their files whole. From 0017 on every patch is
+#   "layered" (it may change files an earlier patch owns): its files are staged first (git add, no commit), so its diff
+#   (working tree against the index) holds only its own change, on top of the earlier patches; git apply takes them
+#   in number order.
+#   Usage (Git Bash): bash scripts/s4-make-patches.sh [outdir]
 set -u
 cd /f/kodi-rt || exit 1
 D=build/s4/kodi-dev
@@ -34,7 +38,16 @@ mk 0014-windows-8bit-render-formats-without-r16.patch xbmc/cores/VideoPlayer/Pro
 mk 0015-windows-arm32-render-thread-priority.patch xbmc/platform/win32/WinMain.cpp \
    xbmc/cores/VideoPlayer/VideoRenderers/windows/RendererBase.cpp xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
 mk 0016-windows-clang-gpu-memcpy-sse41-target.patch xbmc/platform/win32/utils/gpu_memcpy_sse4.h
-# every changed file must be in exactly one patch
-all=$(git -C "$D" diff --name-only | sort); inp=$(cat "$OUT"/00[01][0-9]-*.patch | sed -n 's#^diff --git a/\([^ ]*\) .*#\1#p' | sort)
+# layered patches: stage the tree so far (the patch's files), apply its block, diff against the index
+layer() { local num=$1 name=$2; shift 2
+  git -C "$D" add -- "$@" || exit 1
+  python -I scripts/s4-dev-edits-2.py F:/kodi-rt/$D "$num" || exit 1
+  mk "$name" "$@"; }
+layer 0017 0017-windows-open-with-running-instance.patch xbmc/platform/win32/WinMain.cpp \
+   xbmc/windowing/windows/WinEventsWin32.cpp xbmc/windowing/windows/WinEventsWin32.h
+layer 0018 0018-estuary-osd-fullscreen-icons.patch addons/skin.estuary/xml/VideoOSD.xml
+layer 0019 0019-violet-default-colour-theme.patch system/settings/settings.xml
+# every changed file (against the pinned commit) must be in a patch; layered patches repeat files of earlier ones
+all=$(git -C "$D" diff HEAD --name-only | sort); inp=$(cat "$OUT"/00[01][0-9]-*.patch | sed -n 's#^diff --git a/\([^ ]*\) .*#\1#p' | sort -u)
 [ "$all" = "$inp" ] || { echo "CHANGED FILES NOT COVERED:"; diff <(echo "$all") <(echo "$inp"); exit 1; }
 echo "PATCHES DONE"

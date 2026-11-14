@@ -1,0 +1,16 @@
+script.module.pil for kodi-rt: Pillow 12.0.0 (LICENSE in this folder: the MIT-CMU / HPND licence), built from Kodi's
+pinned source with clang-cl for Windows. Its C modules (lib/PIL/*.pyd) also contain these libraries, statically
+linked, each under its own licence:
+
+  libjpeg-turbo 3.1.4.1   in _imaging.pyd     IJG licence and the Modified (3-clause) BSD licence
+  zlib 1.3.2              in _imaging.pyd     zlib licence
+  FreeType 2.14.2         in _imagingft.pyd   FreeType Licence (FTL), or GPL-2.0 at your choice
+  HarfBuzz 14.2.0         in _imagingft.pyd   "Old MIT" licence
+  FriBidi 1.0.17          in _imagingft.pyd   GNU LGPL 2.1 or later
+  raqm (Pillow's copy)    in _imagingft.pyd   MIT licence
+
+The licence texts are in each library's source archive, all of them Kodi's pinned versions (Kodi's
+tools/depends/target/<library>/*-VERSION files, the archives from Kodi's mirror): libjpeg-turbo LICENSE.md and
+README.ijg, zlib's README / zlib.h, FreeType LICENSE.TXT and docs/FTL.TXT, HarfBuzz COPYING, FriBidi COPYING, and
+Pillow's src/thirdparty/raqm/COPYING. kodi-rt's scripts that build these modules (cross/cmake/pillow,
+scripts/pil-build.sh) and the source versions are part of the kodi-rt project.

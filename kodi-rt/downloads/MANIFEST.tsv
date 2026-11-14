@@ -36,3 +36,6 @@ xz	5.8.3	xz-5.8.3.tar.xz	1548064	OK
 expat	2.8.1	expat-2.8.1.tar.xz	512224	OK
 bzip2	1.0.8	bzip2-1.0.8.tar.gz	810029	OK
 ../native/swig	4.5.0	swig-4.5.0.tar.gz	9178362	OK
+pythonmodule-pycryptodome	3.23.0	pycryptodome-3.23.0.tar.gz	19732639	OK
+pythonmodule-pil	12.0.0	pillow-12.0.0.tar.gz	47008828	OK
+libjpeg-turbo	3.1.4.1	libjpeg-turbo-3.1.4.1.tar.gz	2528617	OK

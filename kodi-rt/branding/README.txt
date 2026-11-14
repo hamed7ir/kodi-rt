@@ -12,3 +12,8 @@ They go into the Kodi tree as the fork's branding commit (release-docs/fork/seri
                    rendered by scripts/s9-poster.ps1 (headless Chrome at 1.5x). Its Kodi screenshots are Kodi's own
                    (tests/s9/poster-shots.ps1, Estuary's violet colour theme); the 1080p numbers are Hamed's, from the
                    Surface RT.
+  vendor_logo.png  media/vendor_logo.png (the Kodi logo on Estuary's home and login screens), hue +85 like the icon:
+                   powershell -NoProfile -File scripts\s9-recolor-png.ps1 -In <kodi's vendor_logo.png> -Out vendor_logo.png
+                   (fork commit 0021, with Estuary's violet colour theme as the default: violet-default-theme.py)
+  osd/             the video OSD's fullscreen/window icons (scripts/s9-osd-icons.ps1), in Estuary's OSD icon style
+                   (fork commit 0020, with osd-fullscreen-icons.py)

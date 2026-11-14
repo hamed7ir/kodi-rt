@@ -10,7 +10,8 @@
 #   ("break" is for run-kodi-dbgrun.cmd only: without a debugger it would raise an unhandled breakpoint.)
 # Options (environment): ADVSET=1 adds kit/portable-data/advancedsettings.xml (Stage 5 run 6 preset); PYTHON=1 adds
 #   python314.dll, kit/python/python314._pth and the stdlib (without tests, IDLE, tkinter, turtledemo, ensurepip) as
-#   kodi\system\python (Stage 6); RTPROF=1 adds bin\rtprof.exe (build/s6/rtprof) for kit/<KNAME>/run-kodi-profile.cmd.
+#   kodi\system\python (Stage 6), and addons\script.module.pycryptodome and script.module.pil from
+#   prefix/arm32/kodi-addons when built (scripts/pycd-build.sh, scripts/pil-build.sh); RTPROF=1 adds bin\rtprof.exe (build/s6/rtprof) for kit/<KNAME>/run-kodi-profile.cmd.
 set -u
 export MSYS2_ARG_CONV_EXCL='*'
 RT=F:/kodi-rt/tc/rt24c-cr/bin
@@ -58,6 +59,19 @@ if [ -n "${PYTHON:-}" ]; then
   cp -r "$PY/Lib" "$K/kodi/system/python/" || exit 1
   ( cd "$K/kodi/system/python/Lib" && rm -rf test idlelib tkinter turtledemo ensurepip && find . -name __pycache__ -prune -exec rm -rf {} + )
   mkdir -p "$K/kodi/system/python/Lib/site-packages"
+  # Kodi's script.module.pycryptodome with the Cryptodome package and its ARM32 C modules (scripts/pycd-build.sh),
+  # in place of the empty stub in the build tree's addons
+  PYCD=/f/kodi-rt/prefix/arm32/kodi-addons/script.module.pycryptodome
+  if [ -d "$PYCD/lib/Cryptodome" ]; then
+    rm -rf "$K/kodi/addons/script.module.pycryptodome" && cp -r "$PYCD" "$K/kodi/addons/" || exit 1
+    find "$K/kodi/addons/script.module.pycryptodome" -name __pycache__ -prune -exec rm -rf {} +
+  fi
+  # the same for Kodi's script.module.pil (Pillow with its ARM32 modules, scripts/pil-build.sh)
+  PIL=/f/kodi-rt/prefix/arm32/kodi-addons/script.module.pil
+  if [ -f "$PIL/lib/PIL/_imaging.pyd" ]; then
+    rm -rf "$K/kodi/addons/script.module.pil" && cp -r "$PIL" "$K/kodi/addons/" || exit 1
+    find "$K/kodi/addons/script.module.pil" -name __pycache__ -prune -exec rm -rf {} +
+  fi
 fi
 
 if [ -n "$ROLE" ]; then

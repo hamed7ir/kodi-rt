@@ -1,8 +1,8 @@
 # kodi-rt Python stage: smoke test of the interpreter and of every module compiled into python314.dll.
 # Prints one line per check, "SMOKE PASS <name>" or "SMOKE FAIL <name>: <error>", then "SMOKE ALL PASS (<n> checks)"
 # or "SMOKE FAILED (<k> of <n>)". Exit code 0 only when everything passed. Runs offline.
-# --require-all: _ssl, _hashlib, _sqlite3 and _zstd must be compiled in too (the Surface RT build); without it they
-# are optional (the x64 reference build has no OpenSSL or zstd).
+# --require-all: _ssl, _hashlib, _sqlite3, _zstd and _ctypes must be compiled in too (the Surface RT and desktop
+# builds); without it they are optional (the x64 reference build has no OpenSSL, zstd or libffi).
 import sys, traceback
 
 results = []
@@ -21,7 +21,7 @@ def _():
             '_multiprocessing', '_overlapped', '_asyncio', '_queue', '_uuid', '_zoneinfo', 'winsound', 'zlib']
     optional = ['_ssl', '_hashlib', '_sqlite3', '_zstd', '_ctypes']
     if REQUIRE_ALL:
-        want += optional[:-1]
+        want += optional
     missing = [m for m in want if m not in sys.builtin_module_names]
     assert not missing, f'not compiled in: {missing}'
     print('   optional present:', [m for m in optional if m in sys.builtin_module_names])
@@ -219,9 +219,38 @@ def _():
 @check('ctypes')
 def _():
     if '_ctypes' not in sys.builtin_module_names:
-        print('   _ctypes not built (deferred)'); return
+        print('   _ctypes not built'); return
     import ctypes
+    from ctypes import wintypes
+    # a Windows API call (stdcall on x86), integer return
     assert ctypes.windll.kernel32.GetTickCount() > 0
+    n = ctypes.windll.kernel32.GetCurrentProcessId()
+    assert n == __import__('os').getpid(), (n, __import__('os').getpid())
+    # doubles in and out (VFP registers on ARM32, XMM on x64)
+    pow_ = ctypes.cdll.msvcrt.pow
+    pow_.restype = ctypes.c_double
+    pow_.argtypes = [ctypes.c_double, ctypes.c_double]
+    assert pow_(2.0, 10.0) == 1024.0 and abs(pow_(2.0, 0.5) - 2 ** 0.5) < 1e-12
+    # a struct passed by value, plus a pointer to a struct
+    rect = wintypes.RECT(0, 0, 100, 50)
+    PtInRect = ctypes.windll.user32.PtInRect
+    PtInRect.argtypes = [ctypes.POINTER(wintypes.RECT), wintypes.POINT]
+    assert PtInRect(ctypes.byref(rect), wintypes.POINT(10, 10)) and not PtInRect(ctypes.byref(rect), wintypes.POINT(200, 10))
+    # a Python callback called from C: libffi closure (trampoline) and ffi_call
+    CMP = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+    calls = []
+    def cmp(a, b):
+        calls.append(1)
+        return a[0] - b[0]
+    arr = (ctypes.c_int * 8)(5, 3, 8, 1, 9, 2, 7, 4)
+    qsort = ctypes.cdll.msvcrt.qsort
+    qsort.restype = None
+    qsort(arr, len(arr), ctypes.sizeof(ctypes.c_int), CMP(cmp))
+    assert list(arr) == [1, 2, 3, 4, 5, 7, 8, 9] and calls, list(arr)
+    # memory and strings
+    buf = ctypes.create_string_buffer(b'kodi-rt', 16)
+    assert ctypes.string_at(buf) == b'kodi-rt' and ctypes.cdll.msvcrt.strlen(buf) == 7
+    print('   ctypes', ctypes.__version__, 'sizeof(void*)', ctypes.sizeof(ctypes.c_void_p), 'qsort callbacks', len(calls))
 
 def main():
     print('python', sys.version.replace('\n', ' '), flush=True)

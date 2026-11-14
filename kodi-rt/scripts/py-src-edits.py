@@ -24,3 +24,12 @@ edit('Objects/mimalloc/prim/windows/prim.c',
      '  #if defined(_WIN64) && defined(_MSC_VER) // 64-bit\n',
      '  #if (defined(_WIN64) || defined(_M_ARM)) && defined(_MSC_VER) // 64-bit; ARM32 has no leading underscore either\n',
      count=3)
+
+# ---------------------------------------------------------------- 0002: _ctypes compiled into python314.dll
+# CPython builds _ctypes as its own _ctypes.pyd, whose DllMain is in callbacks.c. kodi-rt compiles the extension
+# modules into python314.dll (Py_BUILD_CORE_BUILTIN), where PC/dl_nt.c already has the DLL's DllMain: lld-link
+# reported "duplicate symbol: DllMain". The ctypes one (DisableThreadLibraryCalls only) is left out when built in.
+edit('Modules/_ctypes/callbacks.c',
+     '#ifndef Py_NO_ENABLE_SHARED\nBOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvRes)\n',
+     '#if !defined(Py_NO_ENABLE_SHARED) && !defined(Py_BUILD_CORE_BUILTIN) /* kodi-rt: built in, PC/dl_nt.c has it */\n'
+     'BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvRes)\n')

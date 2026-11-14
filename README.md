@@ -2,7 +2,8 @@
 
 ![kodi-rt 1.0](kodi-rt/branding/poster-v1.0.png)
 
-kodi for old arm windows tablets: windows rt 8.1 on the surface rt (tegra 3). this repo is a fork of kodi, and the
+kodi for old arm windows tablets: windows rt 8.1 on the surface rt (tegra 3) and surface 2 (tegra 4). this repo is a
+fork of kodi, and the
 `kodi-rt` branch is kodi master (23.0 alpha, bffa625c) plus my commits on top. it builds for arm32 (armnt), the
 point of it, and for x64 and x86 too, with python 3.14 for add-ons and skins.
 
@@ -11,11 +12,10 @@ as venetium. this is not an official kodi build and team kodi has nothing to do 
 
 ## what it runs on
 
-- surface rt (tegra 3), windows rt 8.1: `Kodi-RT-Setup-1.0-arm32.exe`. that is the device i tested it on
-- surface 2 (tegra 4) should work too, not tested on a device yet
-- x64 and x86 pcs with windows 8.1 or later: `Kodi-RT-Setup-1.0-x64.exe` and `-x86.exe`. checked on my build server
-  only (windows server 2022 over rdp, no gpu): the setups install and uninstall cleanly, and kodi starts, plays an
-  h.264 clip in software, runs python and closes cleanly. not tried on a pc with a real gpu yet
+- surface rt (tegra 3) and surface 2 (tegra 4), windows rt 8.1: `Kodi-RT-Setup-1.1-arm32.exe`. tested on both
+- x64 and x86 pcs with windows 8.1 or later: `Kodi-RT-Setup-1.1-x64.exe` and `-x86.exe`. checked on my build server
+  only (windows server 2022 over rdp, no gpu): the setups install, upgrade and uninstall cleanly, and kodi starts,
+  plays an h.264 clip in software, runs python add-ons and closes cleanly. not tried on a pc with a real gpu yet
 - graphics go through direct3d 11; on the tegra 3 that is feature level 9_1
 
 ## what works
@@ -27,16 +27,18 @@ as venetium. this is not an official kodi build and team kodi has nothing to do 
 - 720p 10-bit hevc (x265) plays smooth in software on the surface rt: 24 fps with no skipped frames. that needed pgo +
   thinlto, neon for ffmpeg's 10-bit motion compensation, and a fix for a kodi bug that sent every 10-bit frame through
   rgb and back
-- python 3.14.10 (kodi's own pin), for add-ons and skins
+- python 3.14.10 (kodi's own pin), for add-ons and skins, with ctypes, pycryptodome 3.23 and pillow 12
+  (libjpeg-turbo, freetype), which a lot of add-ons need
 - https, add-on installs from the repository, subtitles, sound through xaudio2
 - "open with" in explorer: the setup lists kodi rt there for the video, music and playlist types it plays (per user,
   it doesn't take over your default apps). if kodi is already open, the file plays in that kodi (0019)
-- the icon is purple, so it doesn't look like the official kodi, and the splash says 23.0 alpha (master still ships
-  kodi 22's splash)
+- a fullscreen button in the video controls, the same size as the others (0011, 0020)
+- purple, so it doesn't look like the official kodi: the icon, the kodi logo, and estuary's violet theme by default
+  (0021). the splash says 23.0 alpha (master still ships kodi 22's splash)
 
 ## what doesn't yet
 
-- no ctypes in python yet (it needs libffi), and no pillow or pycryptodome, so add-ons that need them fail
+- elementum doesn't work on the rt: its engine has no windows arm build
 - 10-bit video is shown in 8 bits on the tablet (feature level 9_1 has no 10-bit textures)
 - hevc, vp9 and av1 decode in software on the tegra, it has no hardware for them. 720p x265 is what i tested
 - the x64 and x86 builds have no pgo (the profile is from the tablet). their ffmpeg and dav1d do have their x86
@@ -71,8 +73,8 @@ the compiler bugs this port ran into went to llvm-rt, and they are all fixed in 
 
 ## status
 
-v1.0 is the first release. it works on a real device: kodi starts, touch works, video plays smooth. next: python on
-its own release, ctypes, and testing on the surface 2.
+v1.1 is out: python add-ons get ctypes, pycryptodome and pillow, and kodi rt is purple inside too. it works on real
+devices, the surface rt and the surface 2: kodi starts, touch works, video plays smooth.
 
 ## license
 

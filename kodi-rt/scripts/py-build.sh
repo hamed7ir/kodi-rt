@@ -21,10 +21,11 @@ COMMON=(-DPY_SRC=$SRC -DPY_BZ2_DIR=$K/src/deps/bzip2-1.0.8
 case $V in
   freeze) TC=$K/cross/x64-host-rt24.cmake; OPTS=(-DPY_FREEZE_ONLY=ON); PFX=$K/build/py/freeze-install ;;
   x64ref) TC=$K/cross/x64-host-rt24.cmake; PFX=$K/build/py/x64-install
-          OPTS=(-DPY_DEPS_PREFIX=$K/prefix/x64ref -DPY_WITH_SSL=OFF -DPY_WITH_ZSTD=OFF) ;;
-  arm32)  TC=$K/cross/arm32-rt24.cmake; PFX=$K/prefix/arm32/python; OPTS=(-DPY_DEPS_PREFIX=$K/prefix/arm32) ;;
+          OPTS=(-DPY_DEPS_PREFIX=$K/prefix/x64ref -DPY_WITH_SSL=OFF -DPY_WITH_ZSTD=OFF -DPY_WITH_CTYPES=OFF) ;;
+  arm32)  TC=$K/cross/arm32-rt24.cmake; PFX=$K/prefix/arm32/python; OPTS=(-DPY_DEPS_PREFIX=$K/prefix/arm32)
+          [ -f "$K/prefix/arm32/lib/libffi.lib" ] || { echo "prefix/arm32/lib/libffi.lib missing (scripts/py-deps.sh arm32 libffi)"; exit 1; } ;;
   x64|x86) TC=$K/cross/$V-rt24.cmake; PFX=$K/prefix/$V/python; OPTS=(-DPY_DEPS_PREFIX=$K/prefix/$V)
-          for f in libssl.lib libcrypto.lib sqlite3.lib zs.lib lzma.lib; do
+          for f in libssl.lib libcrypto.lib sqlite3.lib zs.lib lzma.lib libffi.lib; do
             [ -f "$K/prefix/$V/lib/$f" ] || { echo "prefix/$V/lib/$f missing"; exit 1; }
           done
           [ -f "$K/prefix/$V/lib/zstd_static.lib" ] || OPTS+=(-DPY_WITH_ZSTD=OFF) ;;
