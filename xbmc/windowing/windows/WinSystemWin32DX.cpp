@@ -29,22 +29,28 @@
 #include <windows.h>
 #include <winnt.h>
 #include <winternl.h>
+// kodi-rt: the driver hook needs Detours and the WDK's d3d10umddi.h; without them it is compiled out
+#if __has_include(<detours.h>) && __has_include(<d3d10umddi.h>)
+#define KODI_RT_DRIVER_HOOK
 #pragma warning(disable: 4091)
 #include <d3d10umddi.h>
 #pragma warning(default: 4091)
 #include <detours.h>
+#endif
 
 using KODI::PLATFORM::WINDOWS::FromW;
 
 using namespace std::chrono_literals;
 
 // User Mode Driver hooks definitions
+#if defined(KODI_RT_DRIVER_HOOK)
 void APIENTRY HookCreateResource(D3D10DDI_HDEVICE hDevice, const D3D10DDIARG_CREATERESOURCE* pResource, D3D10DDI_HRESOURCE hResource, D3D10DDI_HRTRESOURCE hRtResource);
 HRESULT APIENTRY HookCreateDevice(D3D10DDI_HADAPTER hAdapter, D3D10DDIARG_CREATEDEVICE* pCreateData);
 HRESULT APIENTRY HookOpenAdapter10_2(D3D10DDIARG_OPENADAPTER *pOpenData);
 static PFND3D10DDI_OPENADAPTER s_fnOpenAdapter10_2{ nullptr };
 static PFND3D10DDI_CREATEDEVICE s_fnCreateDeviceOrig{ nullptr };
 static PFND3D10DDI_CREATERESOURCE s_fnCreateResourceOrig{ nullptr };
+#endif
 
 void CWinSystemWin32DX::Register()
 {
@@ -229,6 +235,7 @@ bool CWinSystemWin32DX::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, boo
 
 void CWinSystemWin32DX::UninitHooks()
 {
+#if defined(KODI_RT_DRIVER_HOOK)
   // uninstall
   if (!s_fnOpenAdapter10_2)
     return;
@@ -242,10 +249,15 @@ void CWinSystemWin32DX::UninitHooks()
     FreeLibrary(m_hDriverModule);
     m_hDriverModule = nullptr;
   }
+#endif
 }
 
 void CWinSystemWin32DX::InitHooks(IDXGIOutput* pOutput)
 {
+#if !defined(KODI_RT_DRIVER_HOOK)
+  // kodi-rt: the refresh-rate hook into the D3D user-mode driver (Detours + WDK) is not built
+  (void)pOutput;
+#else
   DXGI_OUTPUT_DESC outputDesc;
   if (!pOutput || FAILED(pOutput->GetDesc(&outputDesc)))
     return;
@@ -372,8 +384,10 @@ void CWinSystemWin32DX::FixRefreshRateIfNecessary(const D3D10DDIARG_CREATERESOUR
       }
     }
   }
+#endif
 }
 
+#if defined(KODI_RT_DRIVER_HOOK)
 void APIENTRY HookCreateResource(D3D10DDI_HDEVICE hDevice, const D3D10DDIARG_CREATERESOURCE* pResource, D3D10DDI_HRESOURCE hResource, D3D10DDI_HRTRESOURCE hRtResource)
 {
   if (pResource && pResource->pPrimaryDesc)
@@ -406,6 +420,7 @@ HRESULT APIENTRY HookOpenAdapter10_2(D3D10DDIARG_OPENADAPTER *pOpenData)
   }
   return hr;
 }
+#endif // KODI_RT_DRIVER_HOOK
 
 bool CWinSystemWin32DX::IsHDRDisplay()
 {
