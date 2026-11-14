@@ -143,6 +143,10 @@ CMatrix<Order>::CMatrix(const CMatrix<Order - 1>& other)
   *this = other.Get();
 }
 
+// kodi-rt: used by WinVideoFilter.cpp, which sees only the declaration. Implicit instantiations can be
+// discarded once inlined (clang does), so instantiate it explicitly.
+template CMatrix<4>::CMatrix(const CMatrix<3>& other);
+
 template<uint8_t Order>
 CMatrix<Order>& CMatrix<Order>::operator=(
     const std::array<std::array<float, Order - 1>, Order - 1>& other)
