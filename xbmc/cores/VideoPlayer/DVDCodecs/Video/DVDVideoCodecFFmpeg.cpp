@@ -1350,6 +1350,16 @@ int CDVDVideoCodecFFmpeg::FilterOpen(const std::string& filters, bool scale)
       m_pCodecContext->time_base.num ? m_pCodecContext->time_base.den : 1,
       m_pCodecContext->sample_aspect_ratio.num != 0 ? m_pCodecContext->sample_aspect_ratio.num : 1,
       m_pCodecContext->sample_aspect_ratio.num != 0 ? m_pCodecContext->sample_aspect_ratio.den : 1);
+#if LIBAVFILTER_BUILD >= AV_VERSION_INT(10, 6, 100)
+  // The buffer source declares the colorspace and range of the frames it gets (the frame about to be filtered).
+  // Without them the scaler's output is negotiated as "unspecified", swscale takes that as BT.601, and a BT.709
+  // frame is converted YUV -> RGB -> YUV through an intermediate on every frame (instead of a plain bit-depth
+  // conversion), with shifted colours. Seen with 10-bit video and 8-bit-only renderers.
+  args += StringUtils::Format(
+      ":colorspace={}:range={}",
+      static_cast<int>(m_pDecodedFrame ? m_pDecodedFrame->colorspace : m_pCodecContext->colorspace),
+      static_cast<int>(m_pDecodedFrame ? m_pDecodedFrame->color_range : m_pCodecContext->color_range));
+#endif
 
   if (!((m_pFilterOut = avfilter_graph_alloc_filter(m_pFilterGraph, outFilter, "out"))))
   {
