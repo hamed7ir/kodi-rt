@@ -209,6 +209,11 @@ bool win32_exception::write_stacktrace(EXCEPTION_POINTERS* pEp)
   frame.AddrPC.Offset = pEp->ContextRecord->Eip; // Current location in program
   frame.AddrStack.Offset = pEp->ContextRecord->Esp; // Stack pointers current value
   frame.AddrFrame.Offset = pEp->ContextRecord->Ebp; // Value of register used to access local function variables.
+#elif defined(_M_ARM)
+  // kodi-rt: Windows ARM32 CONTEXT: Pc, Sp, and R11 as the frame pointer
+  frame.AddrPC.Offset = pEp->ContextRecord->Pc; // Current location in program
+  frame.AddrStack.Offset = pEp->ContextRecord->Sp; // Stack pointers current value
+  frame.AddrFrame.Offset = pEp->ContextRecord->R11; // Value of register used to access local function variables.
 #elif defined(_M_ARM64)
   frame.AddrPC.Offset = pEp->ContextRecord->Pc; // Current location in program
   frame.AddrStack.Offset = pEp->ContextRecord->Sp; // Stack pointers current value
@@ -241,7 +246,12 @@ bool win32_exception::write_stacktrace(EXCEPTION_POINTERS* pEp)
                                   GetCurrentProcessId());
   WriteFile(hDumpFile, strOutput.c_str(), strOutput.size(), &dwBytes, NULL);
 
-  while(pSW(IMAGE_FILE_MACHINE_I386, hCurProc, GetCurrentThread(), &frame, pEp->ContextRecord, NULL, pSFTA, pSGMB, NULL))
+#if defined(_M_ARM)
+  const DWORD stackWalkMachine = IMAGE_FILE_MACHINE_ARMNT; // kodi-rt
+#else
+  const DWORD stackWalkMachine = IMAGE_FILE_MACHINE_I386;
+#endif
+  while(pSW(stackWalkMachine, hCurProc, GetCurrentThread(), &frame, pEp->ContextRecord, NULL, pSFTA, pSGMB, NULL))
   {
     if(frame.AddrPC.Offset != 0)
     {

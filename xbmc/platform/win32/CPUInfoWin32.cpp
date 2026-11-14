@@ -124,7 +124,7 @@ CCPUInfoWin32::CCPUInfoWin32()
   else
     m_cpuQueryLoad = nullptr;
 
-#ifndef _M_ARM64
+#if !defined(_M_ARM64) && !defined(_M_ARM) // kodi-rt: __cpuid is x86/x64 only
   int CPUInfo[4] = {}; // receives EAX, EBX, ECD and EDX in that order
 
   __cpuid(CPUInfo, 0);

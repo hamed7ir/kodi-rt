@@ -843,6 +843,8 @@ bool CAddonInfoBuilder::PlatformSupportsAddon(const AddonInfoPtr& addon)
     "windows-x86_64",
 #elif defined(_M_ARM64)
     "windows-arm64",
+#elif defined(_M_ARM)
+    "windows-arm", // kodi-rt: Windows RT 8.1 (ARM32)
 #else
 #error no architecture dependant platform tag
 #endif
