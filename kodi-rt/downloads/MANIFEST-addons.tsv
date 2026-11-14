@@ -1,0 +1,8 @@
+name	url	archive	bytes	sha256
+pugixml	https://github.com/zeux/pugixml/releases/download/v1.16/pugixml-1.16.tar.gz	pugixml-pugixml-1.16.tar.gz	398377	4cee1ca4aad395170f4c7a07824f3bdd41f28316c6e1e1090a1425b278ec0b4b
+dlfcn-win32	https://github.com/dlfcn-win32/dlfcn-win32/archive/v1.4.2.tar.gz	dlfcn-win32-v1.4.2.tar.gz	25027	f61a874bc9163ab488accb364fd681d109870c86e8071f4710cbcdcbaf9f2565
+bento4	https://github.com/xbmc/Bento4/archive/refs/tags/1.6.0-641-6-Piers.tar.gz	bento4-1.6.0-641-6-Piers.tar.gz	5500221	cb5006cd30889238760556e6148f69be34fef4dc48e8d895a9822f805504a5c0
+libxml2	https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz	libxml2-libxml2-2.15.4.tar.xz	3177444	98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821
+bz2	http://mirrors.kodi.tv/build-deps/sources/bzip2-1.0.8.tar.gz	bz2-bzip2-1.0.8.tar.gz	810029	ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269
+lz4	https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz	lz4-lz4-1.10.0.tar.gz	387114	537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b
+libarchive	https://github.com/libarchive/libarchive/releases/download/v3.8.9/libarchive-3.8.9.tar.xz	libarchive-libarchive-3.8.9.tar.xz	6617696	888c934f9d95648ecb9163dc8e23ab80a476ecb81a8f1154704a227b5b676dde

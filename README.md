@@ -29,6 +29,9 @@ as venetium. this is not an official kodi build and team kodi has nothing to do 
   rgb and back
 - python 3.14.10 (kodi's own pin), for add-ons and skins, with ctypes, pycryptodome 3.23 and pillow 12
   (libjpeg-turbo, freetype), which a lot of add-ons need
+- the binary add-ons other add-ons depend on, built for arm32 and in the setup, because kodi's repository has none
+  for 32-bit arm windows: inputstream.adaptive (youtube and most video add-ons need it), inputstream.ffmpegdirect,
+  inputstream.rtmp, iptv simple, vfs.rar and vfs.libarchive. on x64 and x86, kodi installs them from its repository
 - https, add-on installs from the repository, subtitles, sound through xaudio2
 - "open with" in explorer: the setup lists kodi rt there for the video, music and playlist types it plays (per user,
   it doesn't take over your default apps). if kodi is already open, the file plays in that kodi (0019)
@@ -39,6 +42,8 @@ as venetium. this is not an official kodi build and team kodi has nothing to do 
 ## what doesn't yet
 
 - elementum doesn't work on the rt: its engine has no windows arm build
+- drm (widevine) doesn't work on the rt either: widevine has no build for 32-bit arm windows
+- the other binary add-ons (pvr clients for tv backends, audio decoders, visualizations) aren't built for arm32 yet
 - 10-bit video is shown in 8 bits on the tablet (feature level 9_1 has no 10-bit textures)
 - hevc, vp9 and av1 decode in software on the tegra, it has no hardware for them. 720p x265 is what i tested
 - the x64 and x86 builds have no pgo (the profile is from the tablet). their ffmpeg and dav1d do have their x86
@@ -57,6 +62,11 @@ uninstall from control panel or with `uninstall.exe`; your kodi data stays.
 on the tablet skiploopfilter is 48 by default (skips the deblocking of software-decoded video, that is what makes
 x265 fast enough). to change it, put your own `<skiploopfilter>` in `%AppData%\Kodi\userdata\advancedsettings.xml`:
 0 is kodi's default (full quality, slower). the x64 and x86 setups keep kodi's defaults.
+
+on a pc, the binary add-ons kodi installs from its repository (inputstream.adaptive for youtube, iptv simple and
+the like) are official kodi builds and need microsoft's visual c++ 2015-2022 redistributable (x64 or x86, the same
+as your setup). official kodi ships it, these builds don't, so install it if such an add-on doesn't load. the arm32
+setup doesn't need it: its binary add-ons are built in.
 
 ## how it is built
 

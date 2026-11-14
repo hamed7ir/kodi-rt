@@ -11,7 +11,7 @@
 #   script.module.pycryptodome, .pil  prefix/<arch>/kodi-addons (the Python stage: this arch's C modules) in place
 #                                     of the build tree's empty stubs, with Python
 # Checks: machine type of every program and C module (x64 0x8664, x86 0x14c), the data comparison (without
-# pycryptodome and Pillow, which are per arch), Python on/off matching the
+# pycryptodome and Pillow, which are per arch, and the ARM32-only binary add-ons), Python on/off matching the
 # build. No portable_data (the installer leaves it out anyway). MANIFEST.txt with sha256 of every file.
 # Usage (Git Bash): bash scripts/s9-package-kit.sh x64
 set -u
@@ -27,7 +27,7 @@ py=$(grep -E '^ENABLE_PYTHON:' "$BD/CMakeCache.txt" | cut -d= -f2)
 rm -rf "$K"; mkdir -p "$K/kodi" || exit 1
 for d in addons media system userdata; do cp -r "$BD/$d" "$K/kodi/" || exit 1; done
 # the build tree's data against the ARM32 kit's (system/python is Python's, portable_data the kit's own)
-d=$(diff -rq -x python "$K/kodi/system" "$ARMK/system" 2>&1; for x in addons media userdata; do diff -rq -x script.module.pycryptodome -x script.module.pil "$K/kodi/$x" "$ARMK/$x" 2>&1; done)
+d=$(diff -rq -x python "$K/kodi/system" "$ARMK/system" 2>&1; for x in addons media userdata; do diff -rq -x script.module.pycryptodome -x script.module.pil -x inputstream.adaptive -x inputstream.ffmpegdirect -x inputstream.rtmp -x pvr.iptvsimple -x vfs.libarchive -x vfs.rar "$K/kodi/$x" "$ARMK/$x" 2>&1; done)
 if [ -n "$d" ]; then echo "DATA DIFFERS FROM THE ARM32 KIT:"; echo "$d" | head -20; exit 1; fi
 cp "$BD/kodi.exe" "$PFX/bin/dvdnav.dll" "$K/kodi/" || exit 1
 progs=("$K/kodi/kodi.exe" "$K/kodi/dvdnav.dll")

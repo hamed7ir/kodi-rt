@@ -9,6 +9,8 @@
 #   python314.dll     prefix/arm32/python (the Python stage: with _ctypes since 2026-11-14; check 9 of the same gate)
 #   script.module.pycryptodome, script.module.pil   prefix/arm32/kodi-addons (the Python stage: pycryptodome's 40
 #                     ARM32 C modules, Pillow's 4 with libjpeg-turbo/FreeType) in place of Kodi's empty stubs
+#   binary add-ons    build/s10/install-arm32 (scripts/s10-addon.sh; Kodi's repository has none for 32-bit ARM
+#                     Windows): $BADDONS, each DLL the one scripts/s10-check-arm32.sh passed (its log names the sha256)
 # Checks: ARMNT (programs and the C modules), the gate log names this exe and this python314.dll, the kit's
 # Lib/ctypes is the Python stage's, MANIFEST.txt with sha256 of every file.
 # Usage (Git Bash): bash scripts/s8-package-release-arm32.sh
@@ -20,7 +22,15 @@ EXE=$W/build/s7/kodi-build-pgo/kodi.exe
 PYD=$W/prefix/arm32/python/python314.dll
 ADDONS=$W/prefix/arm32/kodi-addons   # script.module.pycryptodome, script.module.pil (the Python stage)
 GATE=$W/logs/s8-gate-arm32.log   # GATELOG=logs/s8-gate-arm32.log bash scripts/s4-gate.sh build/s7/kodi-build-pgo
+BIN=$W/build/s10/install-arm32
+BCHK=$W/logs/s10-check-arm32.log   # bash scripts/s10-check-arm32.sh (all add-ons in $BIN)
+BADDONS=${BADDONS:-"inputstream.adaptive inputstream.ffmpegdirect inputstream.rtmp pvr.iptvsimple vfs.libarchive vfs.rar"}
 tail -1 "$GATE" | grep -q "S4 GATE (server): PASS" || { echo "the ARM32 gate log does not end with PASS ($GATE)"; exit 1; }
+tail -1 "$BCHK" | grep -q "ADDON ARM32 CHECK: PASS" || { echo "the binary add-on check log does not end with PASS ($BCHK)"; exit 1; }
+for a in $BADDONS; do
+  ls "$BIN/$a"/*.dll > /dev/null 2>&1 || { echo "no $BIN/$a (scripts/s10-addon.sh arm32 $a)"; exit 1; }
+  for f in "$BIN/$a"/*.dll; do grep -q "$(sha256sum "$f" | cut -d' ' -f1)" "$BCHK" || { echo "$f is not the DLL the add-on check passed"; exit 1; }; done
+done
 grep -q "$(sha256sum "$EXE" | cut -d' ' -f1)" "$GATE" || { echo "the gate log is not for this kodi.exe"; exit 1; }
 grep -q "$(sha256sum "$PYD" | cut -d' ' -f1)" "$GATE" || { echo "the gate log is not for this python314.dll (check 9)"; exit 1; }
 [ -f "$ADDONS/script.module.pycryptodome/lib/Cryptodome/__init__.py" ] || { echo "no pycryptodome in $ADDONS"; exit 1; }
@@ -37,15 +47,18 @@ cp -f "$EXE" "$K/kodi/kodi.exe" || exit 1
 # Python with _ctypes, and the real pycryptodome and Pillow over Kodi's stubs (addon.xml + icon only)
 cp -f "$PYD" "$K/kodi/python314.dll" || exit 1
 for a in script.module.pycryptodome script.module.pil; do rm -rf "$K/kodi/addons/$a" && cp -r "$ADDONS/$a" "$K/kodi/addons/" || exit 1; done
+# the binary add-ons (inputstream.adaptive is one of Kodi's optional system add-ons: on by default)
+for a in $BADDONS; do rm -rf "$K/kodi/addons/$a" && cp -r "$BIN/$a" "$K/kodi/addons/" || exit 1; done
 d=$(diff -rq -x __pycache__ "$K/kodi/system/python/Lib/ctypes" "$W/prefix/arm32/python/Lib/ctypes" 2>&1)
 [ -z "$d" ] || { echo "the base kit's Lib/ctypes differs from the Python stage's:"; echo "$d" | head; exit 1; }
 cmp -s "$K/kodi/media/splash.jpg" "$W/branding/splash.jpg" || { echo "the build tree's splash.jpg is not branding/splash.jpg"; exit 1; }
 n1=$(find "$K/kodi/addons/script.module.pycryptodome" -name '*.pyd' | wc -l); n2=$(find "$K/kodi/addons/script.module.pil" -name '*.pyd' | wc -l)
 [ "$n1" -ge 40 ] && [ "$n2" -ge 4 ] || { echo "C modules: pycryptodome $n1, Pillow $n2"; exit 1; }
 mapfile -t mods < <(find "$K/kodi/addons/script.module.pycryptodome" "$K/kodi/addons/script.module.pil" -name '*.pyd' | while read -r f; do cygpath -m "$f"; done)
+mapfile -t bins < <(for a in $BADDONS; do ls "$K/kodi/addons/$a"/*.dll; done | while read -r f; do cygpath -m "$f"; done)
 python -I F:/kodi-rt/scripts/check-machine.py --want=0x1c4 "$(cygpath -m "$K/kodi/kodi.exe")" "$(cygpath -m "$K/kodi/dvdnav.dll")" \
-  "$(cygpath -m "$K/kodi/python314.dll")" "${mods[@]}" > /dev/null || { echo "not all ARM32"; exit 1; }
-echo "ARM32: kodi.exe, dvdnav.dll, python314.dll and ${#mods[@]} C modules (pycryptodome $n1, Pillow $n2)"
+  "$(cygpath -m "$K/kodi/python314.dll")" "${mods[@]}" "${bins[@]}" > /dev/null || { echo "not all ARM32"; exit 1; }
+echo "ARM32: kodi.exe, dvdnav.dll, python314.dll, ${#mods[@]} C modules (pycryptodome $n1, Pillow $n2), ${#bins[@]} binary add-ons"
 ( cd "$K" && find . -type f ! -name MANIFEST.txt | sed 's|^\./||' | sort | while read -r f; do printf '%s  %s\n' "$(sha256sum "$f" | cut -d' ' -f1)" "$f"; done ) > "$K/MANIFEST.txt"
 python -I -c "import sys; p=sys.argv[1]; d=open(p,'rb').read().replace(b'\r\n',b'\n').replace(b'\n',b'\r\n'); open(p,'wb').write(d)" "$(cygpath -m "$K/MANIFEST.txt")"
 echo "kit: $K ($(find "$K" -type f | wc -l) files, $(du -sh "$K" | cut -f1)); kodi.exe sha256 $(sha256sum "$K/kodi/kodi.exe" | cut -c1-16)..."

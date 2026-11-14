@@ -1,0 +1,16 @@
+kodi-rt: unrarxlib: compile log.cpp once. consio.cpp already does #include "log.cpp", so building log.cpp as
+well defines InitLogOptions twice; whether a link fails then depends on which library member the linker loads
+first (lld-link: duplicate symbol). Applied by scripts/s10-addon.sh before the build.
+
+diff --git a/lib/UnrarXLib/CMakeLists.txt b/lib/UnrarXLib/CMakeLists.txt
+index a4fdf8e..e3b792c 100644
+--- a/lib/UnrarXLib/CMakeLists.txt
++++ b/lib/UnrarXLib/CMakeLists.txt
+@@ -21,7 +21,6 @@ set(SOURCES archive.cpp
+             headers.cpp
+             isnt.cpp
+             list.cpp
+-            log.cpp
+             match.cpp
+             options.cpp
+             pathfn.cpp

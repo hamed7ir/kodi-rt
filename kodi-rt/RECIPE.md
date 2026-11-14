@@ -106,6 +106,26 @@ x86 toolchain files (rt2.4 `f6e5f8e0`, sdk 10.0.26100 headers and libs, static `
 - `s9-package-kit.sh`: the installer's payload (kodi's data from the build, python's library from the arm32 kit);
   `s9-gate.sh` checks the exe; `tests/s9/smoke-kodi.ps1` starts it and plays a clip (it needs a session with a screen)
 
+## 8. binary add-ons for arm32 (`s10-*`)
+
+kodi's repository has windows builds of its binary add-ons for x64, x86 and arm64, none for 32-bit arm, so the arm32
+setup ships its own: the ones other add-ons depend on (inputstream.adaptive, inputstream.ffmpegdirect,
+inputstream.rtmp, pvr.iptvsimple, vfs.rar, vfs.libarchive), from the piers branches kodi master pins
+(`cmake/addons/bootstrap/repositories/binary-addons.txt`), cloned into `src/addons`.
+
+- `s10-addon-deps.sh <arch>`: their libraries that kodi's prefix doesn't have (pugixml, dlfcn-win32, bento4, librtmp,
+  libxml2, bzip2, lz4, libarchive), static, into `prefix/<arch>-addons`. urls and sha256 come from the add-ons' own
+  `depends/` folders, and so do the patches and cmake files kodi's add-on build would use (`downloads/sources/addons`)
+- `s10-addon.sh <arch> <id>`: one add-on, against the add-on dev kit our kodi build writes (`build/lib/kodi`), with
+  the platform tag kodi checks (`windows-arm`, which our kodi accepts since 0002), `NOMINMAX` as in kodi's own build,
+  and kodi-rt's fixes from `patches-addons/<id>` (vfs.rar: its unrar library built `log.cpp` twice)
+- `s10-ffmpeg.sh`: the ffmpeg inputstream.ffmpegdirect links. unlike kodi's, it has openssl (the add-on opens
+  https/hls/rtmp streams with ffmpeg's own protocols) and libxml2 (dash). gplv3 with openssl 3 instead of the add-on's
+  own `--enable-nonfree`, which would make it undistributable. `cross/pkg-config-arm32-ffmpegdirect.sh` stands in for
+  pkg-config, which ffmpeg needs for those two and this server doesn't have
+- `s10-check-arm32.sh`: the device checks of the gate for every add-on dll (armnt, imports exist on the tablet, no vc
+  runtime, the 0031 check); `s8-package-release-arm32.sh` takes only the dlls it passed
+
 ## device kits
 
 `kit/` has the run scripts and readmes of the device kits (`s5-package-*.sh` make them) and the presets: the touch

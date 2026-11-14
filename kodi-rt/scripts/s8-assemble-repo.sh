@@ -1,7 +1,8 @@
 #!/bin/bash
 # kodi-rt: assemble the release repo tree release/kodi-rt from the work tree, for Hamed to commit and push himself.
 #   docs (README, RECIPE, NOTICES, LICENSE, release notes, .gitignore, pgo/) from release-docs/; the recipe from the
-#   work tree: patches, patches-ffmpeg, scripts, cross, installer, tools (sources: rtprof, pgo, dbgrun, mdump*.py), tests
+#   work tree: patches, patches-ffmpeg, patches-addons, scripts, cross, installer, tools (sources: rtprof, pgo, dbgrun,
+#              mdump*.py), tests
 #   (sources only), kit (the presets and the latest kits' hand-written files), downloads/MANIFEST.tsv.
 #   Never: binaries, build outputs, downloads, logs, device results, reports.
 # Refuses to touch release/kodi-rt once it is a git repo (then copy changes in by hand).
@@ -17,7 +18,8 @@ cp "$W/release-docs/README.md" "$W/release-docs/RECIPE.md" "$W/release-docs/NOTI
    "$W/release-docs/RELEASE-NOTES-v1.0.md" "$W/release-docs/.gitignore" "$R/" || exit 1
 sed -i "s/SETUP_SHA256/$(sha256sum "$SETUP" | cut -d' ' -f1)/" "$R/RELEASE-NOTES-v1.0.md"
 cp -r "$W/release-docs/pgo" "$R/" || exit 1
-cp -r "$W/patches" "$W/patches-ffmpeg" "$W/scripts" "$W/cross" "$W/installer" "$R/" || exit 1
+cp -r "$W/patches" "$W/patches-ffmpeg" "$W/patches-addons" "$W/scripts" "$W/cross" "$W/installer" "$R/" || exit 1
+find "$R/scripts" -maxdepth 1 -name '.*-frozen.sh' -delete   # launch-detached.ps1's run copies of scripts
 mkdir -p "$R/tools/dbgrun"
 cp -r "$W/tools/rtprof" "$W/tools/pgo" "$R/tools/" && cp "$W"/tools/mdump*.py "$R/tools/" \
   && cp "$W/tools/dbgrun/dbgrun.c" "$W/tools/dbgrun/build.sh" "$R/tools/dbgrun/" || exit 1
@@ -30,6 +32,7 @@ for k in kodi-rt-stage6-pgo kodi-rt-pgo-profile; do
   mkdir -p "$R/kit/$k" && cp "$W/kit/$k"/*.cmd "$W/kit/$k/README.txt" "$R/kit/$k/" || exit 1
 done
 mkdir -p "$R/downloads" && cp "$W/downloads/sources/MANIFEST.tsv" "$R/downloads/" || exit 1
+cp "$W/downloads/sources/addons/MANIFEST.tsv" "$R/downloads/MANIFEST-addons.tsv" || exit 1   # scripts/s10-addon-deps.sh
 mkdir -p "$R/branding" && cp "$W/branding/README.txt" "$W/branding/poster-v1.0.png" "$R/branding/" || exit 1   # icon + splash are in the Kodi tree (commit 0018)
 find "$R" -name __pycache__ -type d -prune -exec rm -rf {} +
 
